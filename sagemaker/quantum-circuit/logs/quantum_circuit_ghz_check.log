@@ -1,0 +1,261 @@
+(JupyterSystemEnv) sh-4.2$ cat quantum_circuit_ghz_check.py 
+#!/usr/bin/env python
+
+import boto3
+from collections import Counter
+import matplotlib
+matplotlib.use('Agg')  # Non-interactive backend for EC2
+import matplotlib.pyplot as plt
+import json
+import sagemaker
+from sagemaker.estimator import Estimator
+import pandas as pd
+from io import StringIO
+from sklearn.model_selection import train_test_split
+
+# Initialize S3 client
+s3 = boto3.client('s3')
+
+# Retrieve quantum circuit results from S3
+bucket = 'amazon-braket-my-quantum-output-20250514-kerstarsoc'
+key = 'quantum-output/1b7eb990-5072-4b81-94ff-cf81c2c227b6/results.json'
+response = s3.get_object(Bucket=bucket, Key=key)
+results = json.loads(response['Body'].read().decode())
+
+# Convert measurements to measurement counts
+measurements = results['measurements']
+measurement_counts = Counter(''.join(map(str, m)) for m in measurements)
+print(measurement_counts)
+
+# Plot histogram
+plt.bar(measurement_counts.keys(), measurement_counts.values())
+plt.xlabel('State')
+plt.ylabel('Counts')
+plt.title('GHZ State Measurement Counts')
+plt.savefig('measurement_counts_ghz.png')
+
+# Upload plot to S3
+s3.upload_file('measurement_counts_ghz.png', 'sagemaker-us-east-1-084375569056', 'measurement_counts_ghz.png')
+plt.close()
+
+# Preprocess abalone.csv to LIBSVM format
+response = s3.get_object(Bucket='sagemaker-us-east-1-084375569056', Key='abalone.csv')
+csv_content = response['Body'].read().decode('utf-8')
+df = pd.read_csv(StringIO(csv_content), header=None)
+
+# Map categorical 'sex' column (M/F/I) to numeric (0/1/2)
+sex_mapping = {'M': 0, 'F': 1, 'I': 2}
+df[0] = df[0].map(sex_mapping)
+
+# Split into train and validation sets
+train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
+
+# Function to convert DataFrame to LIBSVM
+def df_to_libsvm(df, filename, s3_bucket, s3_key):
+    libsvm_lines = []
+    for _, row in df.iterrows():
+        label = row[8]  # Rings
+        features = [f"{i+1}:{row[i]}" for i in range(8) if pd.notnull(row[i])]
+        libsvm_line = f"{label} {' '.join(features)}"
+        libsvm_lines.append(libsvm_line)
+    with open(filename, 'w') as f:
+        f.write('\n'.join(libsvm_lines))
+    s3.upload_file(filename, s3_bucket, s3_key)
+
+# Save train and validation LIBSVM files
+train_key = 'abalone_train.libsvm'
+val_key = 'abalone_validation.libsvm'
+df_to_libsvm(train_df, 'abalone_train.libsvm', 'sagemaker-us-east-1-084375569056', train_key)
+df_to_libsvm(val_df, 'abalone_validation.libsvm', 'sagemaker-us-east-1-084375569056', val_key)
+
+# SageMaker XGBoost training
+session = sagemaker.Session()
+role = 'arn:aws:iam::084375569056:role/service-role/AmazonSageMaker-ExecutionRole-20250513T204281'
+estimator = Estimator(
+    image_uri='683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:1.5-1',
+    role=role,
+    instance_count=1,
+    instance_type='ml.m5.large',
+    output_path='s3://sagemaker-us-east-1-084375569056/output',
+    sagemaker_session=session,
+    hyperparameters={
+        'num_round': 100,
+        'objective': 'reg:squarederror',
+        'max_depth': 5,
+        'eta': 0.2,
+        'subsample': 0.8,
+        'early_stopping_rounds': 10
+    }
+)
+estimator.fit({
+    'train': f's3://sagemaker-us-east-1-084375569056/{train_key}',
+    'validation': f's3://sagemaker-us-east-1-084375569056/{val_key}'
+})
+
+# Deploy the model (commented to avoid costs)
+predictor = estimator.deploy(initial_instance_count=1, instance_type='ml.m5.large')
+(JupyterSystemEnv) sh-4.2$ ./quantum_circuit_ghz_check.py 
+/home/ec2-user/anaconda3/envs/JupyterSystemEnv/lib/python3.10/site-packages/pydantic/_internal/_fields.py:198: UserWarning: Field name "json" in "MonitoringDatasetFormat" shadows an attribute in parent "Base"
+  warnings.warn(
+[05/16/25 18:10:48] INFO     Found credentials from IAM Role:                               credentials.py:1132
+                             BaseNotebookInstanceEc2InstanceRole                                               
+sagemaker.config INFO - Not applying SDK defaults from location: /etc/xdg/sagemaker/config.yaml
+sagemaker.config INFO - Not applying SDK defaults from location: /home/ec2-user/.config/sagemaker/config.yaml
+[05/16/25 18:10:49] INFO     Found credentials from IAM Role:                               credentials.py:1132
+                             BaseNotebookInstanceEc2InstanceRole                                               
+Counter({'000': 514, '111': 486})
+                    INFO     Using categorical units to plot a list of strings that are all     category.py:224
+                             parsable as floats or dates. If these strings should be plotted as                
+                             numbers, cast to the appropriate data type before plotting.                       
+                    INFO     Using categorical units to plot a list of strings that are all     category.py:224
+                             parsable as floats or dates. If these strings should be plotted as                
+                             numbers, cast to the appropriate data type before plotting.                       
+[05/16/25 18:10:50] INFO     SageMaker Python SDK will collect telemetry to help us     telemetry_logging.py:91
+                             better understand our user's needs, diagnose issues, and                          
+                             deliver additional features.                                                      
+                             To opt out of telemetry, please disable via                                       
+                             TelemetryOptOut parameter in SDK defaults config. For more                        
+                             information, refer to                                                             
+                             https://sagemaker.readthedocs.io/en/stable/overview.html#c                        
+                             onfiguring-and-using-defaults-with-the-sagemaker-python-sd                        
+                             k.                                                                                
+                    INFO     Creating training-job with name:                                   session.py:1042
+                             sagemaker-xgboost-2025-05-16-18-10-50-386                                         
+2025-05-16 18:10:52 Starting - Starting the training job...
+2025-05-16 18:11:07 Starting - Preparing the instances for training...
+2025-05-16 18:11:32 Downloading - Downloading input data...
+2025-05-16 18:12:18 Downloading - Downloading the training image......
+2025-05-16 18:13:24 Training - Training image download completed. Training in progress.
+2025-05-16 18:13:24 Uploading - Uploading generated training model./miniconda3/lib/python3.8/site-packages/xgboost/compat.py:36: FutureWarning: pandas.Int64Index is deprecated and will be removed from pandas in a future version. Use pandas.Index with the appropriate dtype instead.
+  from pandas import MultiIndex, Int64Index
+[2025-05-16 18:13:18.683 ip-10-0-232-255.ec2.internal:7 INFO utils.py:28] RULE_JOB_STOP_SIGNAL_FILENAME: None
+[2025-05-16 18:13:18.705 ip-10-0-232-255.ec2.internal:7 INFO profiler_config_parser.py:111] User has disabled profiler.
+[2025-05-16:18:13:19:INFO] Imported framework sagemaker_xgboost_container.training
+[2025-05-16:18:13:19:INFO] Failed to parse hyperparameter objective value reg:squarederror to Json.
+Returning the value itself
+[2025-05-16:18:13:19:INFO] No GPUs detected (normal if no gpus installed)
+[2025-05-16:18:13:19:INFO] Running XGBoost Sagemaker in algorithm mode
+[2025-05-16:18:13:19:INFO] Determined 0 GPU(s) available on the instance.
+[2025-05-16:18:13:19:INFO] files path: /opt/ml/input/data/train
+[2025-05-16:18:13:19:INFO] files path: /opt/ml/input/data/validation
+[2025-05-16:18:13:19:INFO] Single node training.
+[2025-05-16:18:13:19:INFO] Train matrix has 3341 rows and 9 columns
+[2025-05-16:18:13:19:INFO] Validation matrix has 836 rows
+[2025-05-16 18:13:19.124 ip-10-0-232-255.ec2.internal:7 INFO json_config.py:92] Creating hook from json_config at /opt/ml/input/config/debughookconfig.json.
+[2025-05-16 18:13:19.124 ip-10-0-232-255.ec2.internal:7 INFO hook.py:206] tensorboard_dir has not been set for the hook. SMDebug will not be exporting tensorboard summaries.
+[2025-05-16 18:13:19.125 ip-10-0-232-255.ec2.internal:7 INFO hook.py:259] Saving to /opt/ml/output/tensors
+[2025-05-16 18:13:19.125 ip-10-0-232-255.ec2.internal:7 INFO state_store.py:77] The checkpoint config file /opt/ml/input/config/checkpointconfig.json does not exist.
+[2025-05-16:18:13:19:INFO] Debug hook created from config
+[0]#011train-rmse:8.10066#011validation-rmse:8.09549
+[2025-05-16 18:13:19.145 ip-10-0-232-255.ec2.internal:7 INFO hook.py:427] Monitoring the collections: metrics
+[2025-05-16 18:13:19.149 ip-10-0-232-255.ec2.internal:7 INFO hook.py:491] Hook is writing from the hook with pid: 7
+[1]#011train-rmse:6.61824#011validation-rmse:6.63752
+[2]#011train-rmse:5.44785#011validation-rmse:5.48837
+[3]#011train-rmse:4.53506#011validation-rmse:4.60453
+[4]#011train-rmse:3.83710#011validation-rmse:3.92413
+[5]#011train-rmse:3.29589#011validation-rmse:3.42230
+[6]#011train-rmse:2.90049#011validation-rmse:3.06270
+[7]#011train-rmse:2.60682#011validation-rmse:2.79471
+[8]#011train-rmse:2.38806#011validation-rmse:2.60300
+[9]#011train-rmse:2.22952#011validation-rmse:2.48512
+[10]#011train-rmse:2.11495#011validation-rmse:2.40594
+[11]#011train-rmse:2.02868#011validation-rmse:2.35644
+[12]#011train-rmse:1.97104#011validation-rmse:2.31169
+[13]#011train-rmse:1.93265#011validation-rmse:2.28997
+[14]#011train-rmse:1.89291#011validation-rmse:2.27286
+[15]#011train-rmse:1.85992#011validation-rmse:2.26161
+[16]#011train-rmse:1.83583#011validation-rmse:2.25441
+[17]#011train-rmse:1.81735#011validation-rmse:2.25044
+[18]#011train-rmse:1.79973#011validation-rmse:2.25102
+[19]#011train-rmse:1.78147#011validation-rmse:2.25045
+[20]#011train-rmse:1.76809#011validation-rmse:2.24588
+[21]#011train-rmse:1.75985#011validation-rmse:2.24917
+[22]#011train-rmse:1.75190#011validation-rmse:2.24676
+[23]#011train-rmse:1.74227#011validation-rmse:2.24558
+[24]#011train-rmse:1.72099#011validation-rmse:2.24630
+[25]#011train-rmse:1.70860#011validation-rmse:2.24395
+[26]#011train-rmse:1.70225#011validation-rmse:2.24836
+[27]#011train-rmse:1.68214#011validation-rmse:2.24928
+[28]#011train-rmse:1.67016#011validation-rmse:2.25327
+[29]#011train-rmse:1.65961#011validation-rmse:2.25157
+[30]#011train-rmse:1.65108#011validation-rmse:2.24892
+[31]#011train-rmse:1.64923#011validation-rmse:2.24858
+[32]#011train-rmse:1.64185#011validation-rmse:2.24734
+[33]#011train-rmse:1.63246#011validation-rmse:2.24586
+[34]#011train-rmse:1.62501#011validation-rmse:2.24442
+[35]#011train-rmse:1.62074#011validation-rmse:2.24461
+[36]#011train-rmse:1.61809#011validation-rmse:2.24582
+[37]#011train-rmse:1.60938#011validation-rmse:2.24977
+[38]#011train-rmse:1.60565#011validation-rmse:2.24920
+[39]#011train-rmse:1.60041#011validation-rmse:2.24791
+[40]#011train-rmse:1.59493#011validation-rmse:2.24808
+[41]#011train-rmse:1.58813#011validation-rmse:2.24562
+[42]#011train-rmse:1.57716#011validation-rmse:2.24878
+[43]#011train-rmse:1.56625#011validation-rmse:2.24684
+[44]#011train-rmse:1.55619#011validation-rmse:2.24892
+[45]#011train-rmse:1.54797#011validation-rmse:2.24792
+[46]#011train-rmse:1.54384#011validation-rmse:2.24709
+[47]#011train-rmse:1.53452#011validation-rmse:2.24941
+[48]#011train-rmse:1.52879#011validation-rmse:2.24926
+[49]#011train-rmse:1.51773#011validation-rmse:2.24725
+[50]#011train-rmse:1.50603#011validation-rmse:2.25118
+[51]#011train-rmse:1.49923#011validation-rmse:2.25350
+[52]#011train-rmse:1.49598#011validation-rmse:2.25377
+[53]#011train-rmse:1.48674#011validation-rmse:2.25271
+[54]#011train-rmse:1.47663#011validation-rmse:2.25408
+[55]#011train-rmse:1.46660#011validation-rmse:2.25941
+[56]#011train-rmse:1.46482#011validation-rmse:2.25934
+[57]#011train-rmse:1.45714#011validation-rmse:2.26307
+[58]#011train-rmse:1.44818#011validation-rmse:2.26208
+[59]#011train-rmse:1.44012#011validation-rmse:2.26289
+[60]#011train-rmse:1.42881#011validation-rmse:2.26439
+[61]#011train-rmse:1.42422#011validation-rmse:2.26668
+[62]#011train-rmse:1.41792#011validation-rmse:2.26899
+[63]#011train-rmse:1.41274#011validation-rmse:2.27081
+[64]#011train-rmse:1.40229#011validation-rmse:2.27284
+[65]#011train-rmse:1.39574#011validation-rmse:2.27140
+[66]#011train-rmse:1.39236#011validation-rmse:2.27254
+[67]#011train-rmse:1.38207#011validation-rmse:2.27669
+[68]#011train-rmse:1.37872#011validation-rmse:2.27644
+[69]#011train-rmse:1.37478#011validation-rmse:2.27564
+[70]#011train-rmse:1.36780#011validation-rmse:2.27806
+[71]#011train-rmse:1.36441#011validation-rmse:2.27674
+[72]#011train-rmse:1.35871#011validation-rmse:2.27783
+[73]#011train-rmse:1.35542#011validation-rmse:2.27825
+[74]#011train-rmse:1.35276#011validation-rmse:2.27992
+[75]#011train-rmse:1.34342#011validation-rmse:2.28266
+[76]#011train-rmse:1.33308#011validation-rmse:2.28129
+[77]#011train-rmse:1.32354#011validation-rmse:2.28534
+[78]#011train-rmse:1.31733#011validation-rmse:2.28564
+[79]#011train-rmse:1.31185#011validation-rmse:2.28842
+[80]#011train-rmse:1.30703#011validation-rmse:2.28968
+[81]#011train-rmse:1.29825#011validation-rmse:2.29043
+[82]#011train-rmse:1.29470#011validation-rmse:2.29188
+[83]#011train-rmse:1.28775#011validation-rmse:2.29392
+[84]#011train-rmse:1.28648#011validation-rmse:2.29555
+[85]#011train-rmse:1.27583#011validation-rmse:2.30044
+[86]#011train-rmse:1.27037#011validation-rmse:2.30201
+[87]#011train-rmse:1.26455#011validation-rmse:2.30193
+[88]#011train-rmse:1.25477#011validation-rmse:2.30995
+[89]#011train-rmse:1.24985#011validation-rmse:2.31305
+[90]#011train-rmse:1.24583#011validation-rmse:2.31520
+[91]#011train-rmse:1.23854#011validation-rmse:2.31088
+[92]#011train-rmse:1.23226#011validation-rmse:2.30942
+[93]#011train-rmse:1.22671#011validation-rmse:2.31291
+[94]#011train-rmse:1.22190#011validation-rmse:2.31495
+[95]#011train-rmse:1.21755#011validation-rmse:2.31607
+[96]#011train-rmse:1.21170#011validation-rmse:2.31674
+[97]#011train-rmse:1.20604#011validation-rmse:2.31742
+[98]#011train-rmse:1.20119#011validation-rmse:2.31703
+[99]#011train-rmse:1.19876#011validation-rmse:2.31553
+
+2025-05-16 18:13:37 Completed - Training job completed
+Training seconds: 125
+Billable seconds: 125
+[05/16/25 18:14:08] INFO     Creating model with name:                                          session.py:4094
+                             sagemaker-xgboost-2025-05-16-18-14-07-995                                         
+                    INFO     Creating endpoint-config with name                                 session.py:6019
+                             sagemaker-xgboost-2025-05-16-18-14-07-995                                         
+                    INFO     Creating endpoint with name                                        session.py:4841
+                             sagemaker-xgboost-2025-05-16-18-14-07-995                                         
+------!(JupyterSystemEnv) sh-4.2$ 

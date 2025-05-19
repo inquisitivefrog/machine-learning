@@ -22,11 +22,15 @@ aws s3 ls s3://amazon-braket-my-quantum-output-20250514-kerstarsoc/quantum-outpu
 aws s3 ls s3://amazon-braket-us-east-1-084375569056/jobs/run-ghz-hybrid/1747416094973/data/ --recursive
 aws s3 ls s3://sagemaker-us-east-1-084375569056/ --recursive
 
+# EFS
+aws efs describe-file-systems --region us-east-1 --query "FileSystems[].{FileSystemId:FileSystemId,Tags:Tags}" --output json
+
 # SageMaker
 aws sagemaker list-notebook-instances
 aws sagemaker list-training-jobs
 aws sagemaker list-models
 aws sagemaker list-endpoints
+aws sagemaker list-domains
 
 # EC2
 aws ec2 describe-instances --filters "Name=tag:created-by,Values=Braket" --query "Reservations[].Instances[].{InstanceId:InstanceId,State:State.Name,Tags:Tags}" --region us-east-1

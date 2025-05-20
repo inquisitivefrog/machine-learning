@@ -1,4 +1,3 @@
-sh-4.2$ cat quantum_circuit_ghz_check.py
 #!/usr/bin/env python
 
 import boto3
@@ -19,7 +18,11 @@ s3 = boto3.client('s3')
 # Retrieve quantum circuit results from S3
 bucket = 'amazon-braket-my-quantum-output-20250514-kerstarsoc'
 key = 'quantum-output/1b7eb990-5072-4b81-94ff-cf81c2c227b6/results.json'
-response = s3.get_object(Bucket=bucket, Key=key)
+try:
+    response = s3.get_object(Bucket=bucket, Key=key)
+except s3.exceptions.ClientError as e:
+    print(f"Error accessing S3: {3}")
+    exit(1)
 results = json.loads(response['Body'].read().decode())
 
 # Convert measurements to measurement counts

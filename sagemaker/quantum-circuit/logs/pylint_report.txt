@@ -1,0 +1,67 @@
+************* Module quantum_circuit_ghz_check
+src/quantum_circuit_ghz_check.py:1:7: E0001: Parsing failed: 'invalid syntax (quantum_circuit_ghz_check, line 1)' (syntax-error)
+************* Module quantum_circuit_check
+src/quantum_circuit_check.py:30:0: C0301: Line too long (120/100) (line-too-long)
+src/quantum_circuit_check.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/quantum_circuit_check.py:12:0: C0103: Constant name "bucket" doesn't conform to UPPER_CASE naming style (invalid-name)
+src/quantum_circuit_check.py:13:0: C0103: Constant name "key" doesn't conform to UPPER_CASE naming style (invalid-name)
+src/quantum_circuit_check.py:4:0: C0411: standard import "collections.Counter" should be placed before third party import "boto3" (wrong-import-order)
+src/quantum_circuit_check.py:6:0: C0411: standard import "json" should be placed before third party imports "boto3", "matplotlib.pyplot" (wrong-import-order)
+************* Module quantum_circuit_exec
+src/quantum_circuit_exec.py:7:0: C0301: Line too long (146/100) (line-too-long)
+src/quantum_circuit_exec.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/quantum_circuit_exec.py:3:0: E0401: Unable to import 'braket.aws' (import-error)
+src/quantum_circuit_exec.py:4:0: E0401: Unable to import 'braket.circuits' (import-error)
+************* Module quantum_circuit_ghz
+src/quantum_circuit_ghz.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/quantum_circuit_ghz.py:3:0: E0401: Unable to import 'braket.aws' (import-error)
+src/quantum_circuit_ghz.py:4:0: E0401: Unable to import 'braket.circuits' (import-error)
+************* Module quantum_circuit_ghz_1
+src/quantum_circuit_ghz_1.py:32:0: C0301: Line too long (110/100) (line-too-long)
+src/quantum_circuit_ghz_1.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/quantum_circuit_ghz_1.py:7:0: C0413: Import "import matplotlib.pyplot as plt" should be placed at the top of the module (wrong-import-position)
+src/quantum_circuit_ghz_1.py:8:0: C0413: Import "import json" should be placed at the top of the module (wrong-import-position)
+src/quantum_circuit_ghz_1.py:14:0: C0103: Constant name "bucket" doesn't conform to UPPER_CASE naming style (invalid-name)
+src/quantum_circuit_ghz_1.py:15:0: C0103: Constant name "key" doesn't conform to UPPER_CASE naming style (invalid-name)
+src/quantum_circuit_ghz_1.py:4:0: C0411: standard import "collections.Counter" should be placed before third party import "boto3" (wrong-import-order)
+src/quantum_circuit_ghz_1.py:8:0: C0411: standard import "json" should be placed before third party imports "boto3", "matplotlib", "matplotlib.pyplot" (wrong-import-order)
+************* Module quantum_circuit_hybrid
+src/quantum_circuit_hybrid.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/quantum_circuit_hybrid.py:3:0: E0401: Unable to import 'braket.circuits' (import-error)
+src/quantum_circuit_hybrid.py:4:0: E0401: Unable to import 'braket.aws' (import-error)
+src/quantum_circuit_hybrid.py:5:0: E0401: Unable to import 'braket.jobs' (import-error)
+src/quantum_circuit_hybrid.py:13:0: C0116: Missing function or method docstring (missing-function-docstring)
+src/quantum_circuit_hybrid.py:16:4: W0621: Redefining name 'result' from outer scope (line 26) (redefined-outer-name)
+src/quantum_circuit_hybrid.py:28:11: W0718: Catching too general exception Exception (broad-exception-caught)
+src/quantum_circuit_hybrid.py:24:26: E1101: Instance of 'dict' has no 'arn' member (no-member)
+src/quantum_circuit_hybrid.py:25:29: E1101: Instance of 'dict' has no 'state' member (no-member)
+src/quantum_circuit_hybrid.py:26:17: E1101: Instance of 'dict' has no 'result' member (no-member)
+************* Module quantum_circuit_pennylane
+src/quantum_circuit_pennylane.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/quantum_circuit_pennylane.py:3:0: E0401: Unable to import 'pennylane' (import-error)
+src/quantum_circuit_pennylane.py:12:0: C0116: Missing function or method docstring (missing-function-docstring)
+************* Module quantum_circuit_variational
+src/quantum_circuit_variational.py:7:0: C0301: Line too long (146/100) (line-too-long)
+src/quantum_circuit_variational.py:9:0: C0305: Trailing newlines (trailing-newlines)
+src/quantum_circuit_variational.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+src/quantum_circuit_variational.py:3:0: E0401: Unable to import 'braket.aws' (import-error)
+src/quantum_circuit_variational.py:4:0: E0401: Unable to import 'braket.circuits' (import-error)
+src/quantum_circuit_variational.py:1:0: R0801: Similar lines in 2 files
+==quantum_circuit_check:[13:25]
+==quantum_circuit_ghz_1:[15:27]
+response = s3.get_object(Bucket=bucket, Key=key)
+results = json.loads(response['Body'].read().decode())
+
+# Convert measurements to measurement counts
+measurements = results['measurements']
+measurement_counts = Counter(''.join(map(str, m)) for m in measurements)
+print(measurement_counts)
+
+# Plot histogram
+plt.bar(measurement_counts.keys(), measurement_counts.values())
+plt.xlabel('State')
+plt.ylabel('Counts') (duplicate-code)
+
+-----------------------------------
+Your code has been rated at 0.00/10
+

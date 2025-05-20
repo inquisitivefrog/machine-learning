@@ -1,0 +1,42 @@
+sh-4.2$ cat quantum_circuit_hybrid.py 
+#!/usr/bin/env python3
+
+from braket.circuits import Circuit
+from braket.aws import AwsDevice
+from braket.jobs import hybrid_job
+
+@hybrid_job(
+    device="arn:aws:braket:::device/quantum-simulator/amazon/sv1",
+    role_arn="arn:aws:iam::084375569056:role/AmazonBraketJobsExecutionRole",
+    job_name="run-ghz-hybrid",
+    wait_until_complete=True  # Wait for job to finish
+)
+def run_ghz_hybrid():
+    circuit = Circuit().h(0).cnot(0, 1).cnot(1, 2)
+    device = AwsDevice("arn:aws:braket:::device/quantum-simulator/amazon/sv1")
+    result = device.run(circuit, shots=1000).result()
+    counts = result.measurement_counts
+    prob_000 = counts.get('000', 0) / 1000
+    return {"probability_000": prob_000}
+
+if __name__ == "__main__":
+    try:
+        job = run_ghz_hybrid()
+        print(f"Job ARN: {job.arn}")
+        print(f"Job Status: {job.state()}")
+        result = job.result()
+        print(f"Result: {result}")
+    except Exception as e:
+        print(f"Error: {str(e)}")
+sh-4.2$ ./quantum_circuit_hybrid.py 
+Initializing Braket Job: arn:aws:braket:us-east-1:084375569056:job/acc51817-2b7a-48ed-8dee-fffc87703b10
+Job queue position: 1
+Job queue position: 1
+Job queue position: 1
+Job queue position: 1
+Job queue position: 1
+Job queue position: 1
+Job queue position: 1
+...................Job ARN: arn:aws:braket:us-east-1:084375569056:job/acc51817-2b7a-48ed-8dee-fffc87703b10
+Job Status: COMPLETED
+Result: {'probability_000': 0.523}

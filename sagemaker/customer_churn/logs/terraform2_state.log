@@ -1,0 +1,25 @@
+
+tim@Tims-MBP terraform2 % terraform state list
+data.aws_caller_identity.current
+aws_kms_key.sagemaker_key
+aws_kms_key_policy.sagemaker_key_policy
+module.iam.aws_iam_role.sagemaker_role
+module.iam.aws_iam_role_policy.s3_access
+module.iam.aws_iam_role_policy_attachment.sagemaker_full_access
+module.s3.aws_s3_bucket.main
+module.s3.aws_s3_bucket_acl.main
+module.s3.aws_s3_bucket_ownership_controls.main
+module.sagemaker.aws_sagemaker_domain.main
+module.sagemaker.aws_sagemaker_space.space_1
+module.sagemaker.aws_sagemaker_space.space_2
+module.sagemaker.aws_sagemaker_user_profile.main
+module.vpc.data.aws_availability_zones.available
+module.vpc.aws_security_group.sagemaker_sg
+module.vpc.aws_subnet.main[0]
+module.vpc.aws_subnet.main[1]
+module.vpc.aws_subnet.main[2]
+module.vpc.aws_vpc.main
+module.vpc.aws_vpc_endpoint.sagemaker_api
+module.vpc.aws_vpc_endpoint.sagemaker_runtime
+
+

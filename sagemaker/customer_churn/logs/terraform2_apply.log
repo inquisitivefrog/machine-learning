@@ -1,0 +1,128 @@
+
+tim@Tims-MBP terraform2 % pwd                           
+/Users/tim/Documents/workspace/python3/machine-learning/sagemaker/customer_churn/terraform2
+tim@Tims-MBP terraform2 % terraform apply tfplan
+module.vpc.aws_subnet.main[0]: Destroying... [id=subnet-05f099a6880fb27c5]
+module.vpc.aws_security_group.sagemaker_sg: Destroying... [id=sg-03c3deef63c6e01c1]
+aws_kms_key.sagemaker_key: Creating...
+module.vpc.aws_subnet.main[0]: Destruction complete after 1s
+module.vpc.aws_security_group.sagemaker_sg: Destruction complete after 1s
+module.vpc.aws_vpc.main: Modifying... [id=vpc-0bc8ab9f1172da26b]
+aws_kms_key.sagemaker_key: Creation complete after 5s [id=a30d695a-ab89-478b-9700-4d9f0cd5ddc1]
+aws_kms_key_policy.sagemaker_key_policy: Creating...
+aws_kms_key_policy.sagemaker_key_policy: Creation complete after 5s [id=a30d695a-ab89-478b-9700-4d9f0cd5ddc1]
+module.vpc.aws_vpc.main: Still modifying... [id=vpc-0bc8ab9f1172da26b, 10s elapsed]
+module.vpc.aws_vpc.main: Modifications complete after 12s [id=vpc-0bc8ab9f1172da26b]
+module.vpc.aws_subnet.main[2]: Creating...
+module.vpc.aws_subnet.main[0]: Creating...
+module.vpc.aws_subnet.main[1]: Creating...
+module.vpc.aws_security_group.sagemaker_sg: Creating...
+module.vpc.aws_subnet.main[2]: Creation complete after 1s [id=subnet-048746dd18fe4c634]
+module.vpc.aws_subnet.main[1]: Creation complete after 1s [id=subnet-0e8d25b46c54ec12b]
+module.vpc.aws_subnet.main[0]: Creation complete after 3s [id=subnet-01d1fc9d87cd0d084]
+module.vpc.aws_security_group.sagemaker_sg: Creation complete after 3s [id=sg-0e6466ca88033fc33]
+module.vpc.aws_vpc_endpoint.sagemaker_api: Creating...
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Creating...
+module.sagemaker.aws_sagemaker_domain.main: Creating...
+module.vpc.aws_vpc_endpoint.sagemaker_api: Still creating... [10s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Still creating... [10s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Still creating... [20s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_api: Still creating... [20s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_api: Still creating... [30s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Still creating... [30s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Still creating... [40s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_api: Still creating... [40s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Still creating... [50s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_api: Still creating... [50s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_api: Still creating... [1m0s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Still creating... [1m0s elapsed]
+module.vpc.aws_vpc_endpoint.sagemaker_api: Creation complete after 1m4s [id=vpce-0dd188ba7be6d6c3f]
+module.vpc.aws_vpc_endpoint.sagemaker_runtime: Creation complete after 1m4s [id=vpce-0f951e6528653c52b]
+╷
+│ Error: creating SageMaker AI Domain: operation error SageMaker: CreateDomain, https response error StatusCode: 400, RequestID: 4832e08b-0b95-41a2-b778-13c272741d39, api error ValidationException: Invalid instance type 'ml.t3.medium' for JupyterServer App. Only 'system' instance type is supported
+│ 
+│   with module.sagemaker.aws_sagemaker_domain.main,
+│   on modules/sagemaker/main.tf line 3, in resource "aws_sagemaker_domain" "main":
+│    3: resource "aws_sagemaker_domain" "main" {
+│ 
+╵
+
+tim@Tims-MBP terraform2 % terraform apply tfplan
+module.sagemaker.aws_sagemaker_domain.main: Creating...
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [10s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [20s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [30s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [40s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [50s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [1m0s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [1m10s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [1m20s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [1m30s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [1m40s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [1m50s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Still creating... [2m0s elapsed]
+module.sagemaker.aws_sagemaker_domain.main: Creation complete after 2m5s [id=d-6a9fcefapo4q]
+module.sagemaker.aws_sagemaker_space.space_1: Creating...
+module.sagemaker.aws_sagemaker_space.space_2: Creating...
+module.sagemaker.aws_sagemaker_user_profile.main: Creating...
+module.sagemaker.aws_sagemaker_space.space_1: Creation complete after 4s [id=arn:aws:sagemaker:us-east-1:084375569056:space/d-6a9fcefapo4q/space-1]
+module.sagemaker.aws_sagemaker_user_profile.main: Creation complete after 5s [id=arn:aws:sagemaker:us-east-1:084375569056:user-profile/d-6a9fcefapo4q/bluedragon]
+module.sagemaker.aws_sagemaker_space.space_2: Creation complete after 6s [id=arn:aws:sagemaker:us-east-1:084375569056:space/d-6a9fcefapo4q/space-2]
+
+Apply complete! Resources: 4 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+s3_bucket_name = "sagemaker-customer-churn-20250530"
+sagemaker_domain_id = "d-6a9fcefapo4q"
+sagemaker_user_profile_arn = {
+  "auto_mount_home_efs" = "Enabled"
+  "canvas_app_settings" = tolist([])
+  "code_editor_app_settings" = tolist([])
+  "custom_file_system_config" = tolist([])
+  "custom_posix_user_config" = tolist([])
+  "default_landing_uri" = "studio::"
+  "execution_role" = "arn:aws:iam::084375569056:role/SageMakerExecutionRole"
+  "jupyter_lab_app_settings" = tolist([])
+  "jupyter_server_app_settings" = tolist([
+    {
+      "code_repository" = toset([])
+      "default_resource_spec" = tolist([
+        {
+          "instance_type" = "system"
+          "lifecycle_config_arn" = ""
+          "sagemaker_image_arn" = ""
+          "sagemaker_image_version_alias" = ""
+          "sagemaker_image_version_arn" = ""
+        },
+      ])
+      "lifecycle_config_arns" = toset(null) /* of string */
+    },
+  ])
+  "kernel_gateway_app_settings" = tolist([
+    {
+      "custom_image" = tolist([])
+      "default_resource_spec" = tolist([
+        {
+          "instance_type" = "ml.t3.medium"
+          "lifecycle_config_arn" = ""
+          "sagemaker_image_arn" = ""
+          "sagemaker_image_version_alias" = ""
+          "sagemaker_image_version_arn" = ""
+        },
+      ])
+      "lifecycle_config_arns" = toset(null) /* of string */
+    },
+  ])
+  "r_session_app_settings" = tolist([])
+  "r_studio_server_pro_app_settings" = tolist([])
+  "security_groups" = toset([
+    "sg-0e6466ca88033fc33",
+  ])
+  "sharing_settings" = tolist([])
+  "space_storage_settings" = tolist([])
+  "studio_web_portal" = "ENABLED"
+  "studio_web_portal_settings" = tolist([])
+  "tensor_board_app_settings" = tolist([])
+}
+

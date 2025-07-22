@@ -1,0 +1,6 @@
+
+(py3ml) tim@Tims-MBP customer_churn % ./set_new_studio_env.sh 
+{
+    "DomainArn": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-nehutxreazmp"
+}
+

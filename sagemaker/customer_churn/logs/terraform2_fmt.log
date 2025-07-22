@@ -1,0 +1,7 @@
+
+tim@Tims-MBP terraform2 % pwd                           
+/Users/tim/Documents/workspace/python3/machine-learning/sagemaker/customer_churn/terraform2
+tim@Tims-MBP terraform2 % terraform fmt -recursive
+main.tf
+modules/sagemaker/main.tf
+

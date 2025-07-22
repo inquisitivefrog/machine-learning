@@ -1,0 +1,112 @@
+
+(py3ml) tim@Tims-MBP customer_churn % aws efs describe-file-systems --region us-east-1
+{
+    "FileSystems": [
+        {
+            "OwnerId": "084375569056",
+            "CreationToken": "d-nehutxreazmp",
+            "FileSystemId": "fs-048700fc8ac286ea8",
+            "FileSystemArn": "arn:aws:elasticfilesystem:us-east-1:084375569056:file-system/fs-048700fc8ac286ea8",
+            "CreationTime": "2025-05-20T09:40:12-07:00",
+            "LifeCycleState": "available",
+            "NumberOfMountTargets": 6,
+            "SizeInBytes": {
+                "Value": 6144,
+                "ValueInIA": 0,
+                "ValueInStandard": 6144,
+                "ValueInArchive": 0
+            },
+            "PerformanceMode": "generalPurpose",
+            "Encrypted": true,
+            "KmsKeyId": "arn:aws:kms:us-east-1:084375569056:key/510e8960-00e7-4efd-bd95-42dc2adeb2dd",
+            "ThroughputMode": "bursting",
+            "Tags": [
+                {
+                    "Key": "ManagedByAmazonSageMakerResource",
+                    "Value": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-nehutxreazmp"
+                }
+            ],
+            "FileSystemProtection": {
+                "ReplicationOverwriteProtection": "ENABLED"
+            }
+        }
+    ]
+}
+(py3ml) tim@Tims-MBP customer_churn % aws efs describe-mount-targets --file-system-id fs-048700fc8ac286ea8 --region us-east-1
+{
+    "MountTargets": [
+        {
+            "OwnerId": "084375569056",
+            "MountTargetId": "fsmt-03bece03f1f8780c7",
+            "FileSystemId": "fs-048700fc8ac286ea8",
+            "SubnetId": "subnet-022f529a1e45cbd9e",
+            "LifeCycleState": "available",
+            "IpAddress": "172.31.69.33",
+            "NetworkInterfaceId": "eni-03b6f1a13ee05ea8c",
+            "AvailabilityZoneId": "use1-az5",
+            "AvailabilityZoneName": "us-east-1f",
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "OwnerId": "084375569056",
+            "MountTargetId": "fsmt-05ab73cbf6daf0516",
+            "FileSystemId": "fs-048700fc8ac286ea8",
+            "SubnetId": "subnet-0b74f4426cec96c10",
+            "LifeCycleState": "available",
+            "IpAddress": "172.31.41.34",
+            "NetworkInterfaceId": "eni-068ed3585334fab5f",
+            "AvailabilityZoneId": "use1-az6",
+            "AvailabilityZoneName": "us-east-1b",
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "OwnerId": "084375569056",
+            "MountTargetId": "fsmt-0253a76f96d048212",
+            "FileSystemId": "fs-048700fc8ac286ea8",
+            "SubnetId": "subnet-09a51c993c01450b7",
+            "LifeCycleState": "available",
+            "IpAddress": "172.31.13.109",
+            "NetworkInterfaceId": "eni-0f9bbab01718d49e4",
+            "AvailabilityZoneId": "use1-az1",
+            "AvailabilityZoneName": "us-east-1c",
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "OwnerId": "084375569056",
+            "MountTargetId": "fsmt-044a2c8e109574861",
+            "FileSystemId": "fs-048700fc8ac286ea8",
+            "SubnetId": "subnet-02fa4439bbae7c5a8",
+            "LifeCycleState": "available",
+            "IpAddress": "172.31.59.99",
+            "NetworkInterfaceId": "eni-0614c633dcac5c2e5",
+            "AvailabilityZoneId": "use1-az3",
+            "AvailabilityZoneName": "us-east-1e",
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "OwnerId": "084375569056",
+            "MountTargetId": "fsmt-0d95f43cf5710852d",
+            "FileSystemId": "fs-048700fc8ac286ea8",
+            "SubnetId": "subnet-0e3b525ee2500c7f4",
+            "LifeCycleState": "available",
+            "IpAddress": "172.31.22.95",
+            "NetworkInterfaceId": "eni-0e5e2618610e465e9",
+            "AvailabilityZoneId": "use1-az4",
+            "AvailabilityZoneName": "us-east-1a",
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "OwnerId": "084375569056",
+            "MountTargetId": "fsmt-0f1a6b7c6b22450dc",
+            "FileSystemId": "fs-048700fc8ac286ea8",
+            "SubnetId": "subnet-08c7a7a0adb46cc83",
+            "LifeCycleState": "available",
+            "IpAddress": "172.31.84.241",
+            "NetworkInterfaceId": "eni-0adac1a540322abd8",
+            "AvailabilityZoneId": "use1-az2",
+            "AvailabilityZoneName": "us-east-1d",
+            "VpcId": "vpc-0d76268d482855884"
+        }
+    ]
+}
+

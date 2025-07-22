@@ -1,0 +1,27 @@
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-user-profiles --domain-id d-nehutxreazmp --region us-east-1
+{
+    "UserProfiles": [
+        {
+            "DomainId": "d-nehutxreazmp",
+            "UserProfileName": "default-20250520T093900",
+            "Status": "InService",
+            "CreationTime": "2025-05-20T09:42:17.207000-07:00",
+            "LastModifiedTime": "2025-05-20T09:42:20.540000-07:00"
+        }
+    ]
+}
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker describe-user-profile --domain-id d-nehutxreazmp --user-profile-name default-20250520T093900 --region us-east-1
+{
+    "DomainId": "d-nehutxreazmp",
+    "UserProfileArn": "arn:aws:sagemaker:us-east-1:084375569056:user-profile/d-nehutxreazmp/default-20250520T093900",
+    "UserProfileName": "default-20250520T093900",
+    "HomeEfsFileSystemUid": "200005",
+    "Status": "InService",
+    "LastModifiedTime": "2025-05-20T09:42:20.540000-07:00",
+    "CreationTime": "2025-05-20T09:42:17.207000-07:00",
+    "UserSettings": {
+        "ExecutionRole": "arn:aws:iam::084375569056:role/service-role/AmazonSageMaker-ExecutionRole-20250520T093901",
+        "AutoMountHomeEFS": "DefaultAsDomain"
+    }
+}

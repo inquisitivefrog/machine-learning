@@ -1,0 +1,51 @@
+(py3ml) tim@Tims-MBP customer_churn % aws s3 ls --region us-east-1
+2025-05-14 12:34:17 amazon-braket-my-quantum-output-20250514-kerstarsoc
+2025-05-15 15:32:54 amazon-braket-us-east-1-084375569056
+2025-05-13 20:42:20 sagemaker-studio-084375569056-jznb41g5nl
+2025-05-20 09:40:00 sagemaker-studio-084375569056-lhlbozhzvv
+2025-05-20 09:40:02 sagemaker-us-east-1-084375569056
+(py3ml) tim@Tims-MBP customer_churn % aws s3 ls s3://sagemaker-studio-084375569056-lhlbozhzvv
+
+(py3ml) tim@Tims-MBP customer_churn % aws s3api get-bucket-acl --bucket sagemaker-studio-084375569056-lhlbozhzvv 
+{
+    "Owner": {
+        "DisplayName": "kerstarsoc",
+        "ID": "d1cac264defe43a71aaf5902368dbc9bdf76433489b0071b47ff95ac321cb783"
+    },
+    "Grants": [
+        {
+            "Grantee": {
+                "DisplayName": "kerstarsoc",
+                "ID": "d1cac264defe43a71aaf5902368dbc9bdf76433489b0071b47ff95ac321cb783",
+                "Type": "CanonicalUser"
+            },
+            "Permission": "FULL_CONTROL"
+        }
+    ]
+}
+(py3ml) tim@Tims-MBP customer_churn % aws s3api get-bucket-policy --bucket sagemaker-studio-084375569056-lhlbozhzvv
+{
+    "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"Enforce HTTPS\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::sagemaker-studio-084375569056-lhlbozhzvv\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}"
+
+(py3ml) tim@Tims-MBP customer_churn % aws s3api get-bucket-acl --bucket sagemaker-us-east-1-084375569056           
+{
+    "Owner": {
+        "DisplayName": "kerstarsoc",
+        "ID": "d1cac264defe43a71aaf5902368dbc9bdf76433489b0071b47ff95ac321cb783"
+    },
+    "Grants": [
+        {
+            "Grantee": {
+                "DisplayName": "kerstarsoc",
+                "ID": "d1cac264defe43a71aaf5902368dbc9bdf76433489b0071b47ff95ac321cb783",
+                "Type": "CanonicalUser"
+            },
+            "Permission": "FULL_CONTROL"
+        }
+    ]
+}
+(py3ml) tim@Tims-MBP customer_churn % aws s3api get-bucket-policy --bucket sagemaker-us-east-1-084375569056        
+{
+    "Policy": "{\"Version\":\"2008-10-17\",\"Id\":\"Enforce HTTPS\",\"Statement\":[{\"Effect\":\"Deny\",\"Principal\":\"*\",\"Action\":\"s3:*\",\"Resource\":\"arn:aws:s3:::sagemaker-us-east-1-084375569056\",\"Condition\":{\"Bool\":{\"aws:SecureTransport\":\"false\"}}}]}"
+}
+

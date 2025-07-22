@@ -1,0 +1,215 @@
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-notebook-instances --region us-east-1
+{
+    "NotebookInstances": [
+        {
+            "NotebookInstanceName": "customer-churn",
+            "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:084375569056:notebook-instance/customer-churn",
+            "NotebookInstanceStatus": "InService",
+            "Url": "customer-churn-itsy.notebook.us-east-1.sagemaker.aws",
+            "InstanceType": "ml.t3.medium",
+            "CreationTime": "2025-05-20T10:30:35.808000-07:00",
+            "LastModifiedTime": "2025-05-20T10:34:15.452000-07:00",
+            "DefaultCodeRepository": "https://github.com/aws/amazon-sagemaker-examples.git"
+        }
+    ]
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker describe-notebook-instance --notebook-instance-name customer-churn --region us-east-1
+{
+    "NotebookInstanceArn": "arn:aws:sagemaker:us-east-1:084375569056:notebook-instance/customer-churn",
+    "NotebookInstanceName": "customer-churn",
+    "NotebookInstanceStatus": "InService",
+    "Url": "customer-churn-itsy.notebook.us-east-1.sagemaker.aws",
+    "InstanceType": "ml.t3.medium",
+    "RoleArn": "arn:aws:iam::084375569056:role/service-role/AmazonSageMakerServiceCatalogProductsUseRole",
+    "LastModifiedTime": "2025-05-20T10:34:15.452000-07:00",
+    "CreationTime": "2025-05-20T10:30:35.808000-07:00",
+    "DirectInternetAccess": "Enabled",
+    "VolumeSizeInGB": 5,
+    "DefaultCodeRepository": "https://github.com/aws/amazon-sagemaker-examples.git",
+    "RootAccess": "Enabled",
+    "PlatformIdentifier": "notebook-al2-v3",
+    "InstanceMetadataServiceConfiguration": {
+        "MinimumInstanceMetadataServiceVersion": "2"
+    }
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-spaces --domain-id d-nehutxreazmp --region us-east-1
+{
+    "Spaces": [
+        {
+            "DomainId": "d-nehutxreazmp",
+            "SpaceName": "my-notebook",
+            "Status": "InService",
+            "CreationTime": "2025-05-20T13:03:30.914000-07:00",
+            "LastModifiedTime": "2025-05-20T13:04:19.308000-07:00",
+            "SpaceSettingsSummary": {
+                "AppType": "JupyterLab",
+                "SpaceStorageSettings": {
+                    "EbsStorageSettings": {
+                        "EbsVolumeSizeInGb": 5
+                    }
+                }
+            },
+            "SpaceSharingSettingsSummary": {
+                "SharingType": "Private"
+            },
+            "OwnershipSettingsSummary": {
+                "OwnerUserProfileName": "default-20250520T093900"
+            }
+        },
+        {
+            "DomainId": "d-nehutxreazmp",
+            "SpaceName": "customer-churn",
+            "Status": "InService",
+            "CreationTime": "2025-05-20T11:28:06.704000-07:00",
+            "LastModifiedTime": "2025-05-20T11:28:13.491000-07:00",
+            "SpaceSettingsSummary": {
+                "AppType": "JupyterLab",
+                "SpaceStorageSettings": {
+                    "EbsStorageSettings": {
+                        "EbsVolumeSizeInGb": 5
+                    }
+                }
+            },
+            "SpaceSharingSettingsSummary": {
+                "SharingType": "Shared"
+            },
+            "OwnershipSettingsSummary": {
+                "OwnerUserProfileName": "default-20250520T093900"
+            }
+        }
+    ]
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker describe-space --domain-id d-nehutxreazmp --space-name my-notebook --region us-east-1
+{
+    "DomainId": "d-nehutxreazmp",
+    "SpaceArn": "arn:aws:sagemaker:us-east-1:084375569056:space/d-nehutxreazmp/my-notebook",
+    "SpaceName": "my-notebook",
+    "Status": "InService",
+    "LastModifiedTime": "2025-05-20T13:04:19.308000-07:00",
+    "CreationTime": "2025-05-20T13:03:30.914000-07:00",
+    "SpaceSettings": {
+        "JupyterLabAppSettings": {
+            "DefaultResourceSpec": {
+                "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:885854791233:image/sagemaker-distribution-cpu",
+                "SageMakerImageVersionAlias": "3.0.1",
+                "InstanceType": "ml.t3.medium"
+            }
+        },
+        "AppType": "JupyterLab",
+        "SpaceStorageSettings": {
+            "EbsStorageSettings": {
+                "EbsVolumeSizeInGb": 5
+            }
+        },
+        "CustomFileSystems": []
+    },
+    "OwnershipSettings": {
+        "OwnerUserProfileName": "default-20250520T093900"
+    },
+    "SpaceSharingSettings": {
+        "SharingType": "Private"
+    },
+    "Url": "https://8crnoidz3tqryc6.studio.us-east-1.sagemaker.aws/jupyterlab/default"
+}
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker describe-space --domain-id d-nehutxreazmp --space-name customer-churn --region us-east-1
+{
+    "DomainId": "d-nehutxreazmp",
+    "SpaceArn": "arn:aws:sagemaker:us-east-1:084375569056:space/d-nehutxreazmp/customer-churn",
+    "SpaceName": "customer-churn",
+    "Status": "InService",
+    "LastModifiedTime": "2025-05-20T11:28:13.491000-07:00",
+    "CreationTime": "2025-05-20T11:28:06.704000-07:00",
+    "SpaceSettings": {
+        "AppType": "JupyterLab",
+        "SpaceStorageSettings": {
+            "EbsStorageSettings": {
+                "EbsVolumeSizeInGb": 5
+            }
+        }
+    },
+    "OwnershipSettings": {
+        "OwnerUserProfileName": "default-20250520T093900"
+    },
+    "SpaceSharingSettings": {
+        "SharingType": "Shared"
+    },
+    "Url": "https://5xena0ivmd5pmha.studio.us-east-1.sagemaker.aws/jupyterlab/default"
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-apps --domain-id d-nehutxreazmp --space-name my-notebook --region us-east-1
+{
+    "Apps": [
+        {
+            "DomainId": "d-nehutxreazmp",
+            "SpaceName": "my-notebook",
+            "AppType": "JupyterLab",
+            "AppName": "default",
+            "Status": "InService",
+            "CreationTime": "2025-05-20T13:04:25.055000-07:00",
+            "ResourceSpec": {
+                "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:885854791233:image/sagemaker-distribution-cpu",
+                "SageMakerImageVersionAlias": "3.0.1",
+                "InstanceType": "ml.t3.medium"
+            }
+        }
+    ]
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-apps --domain-id d-nehutxreazmp --space-name customer-churn --region us-east-1
+{
+    "Apps": [
+        {
+            "DomainId": "d-nehutxreazmp",
+            "SpaceName": "customer-churn",
+            "AppType": "JupyterLab",
+            "AppName": "default",
+            "Status": "InService",
+            "CreationTime": "2025-05-20T13:00:58.630000-07:00",
+            "ResourceSpec": {
+                "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:885854791233:image/sagemaker-distribution-cpu",
+                "SageMakerImageVersionAlias": "3.0.1",
+                "InstanceType": "ml.t3.medium"
+            }
+        }
+    ]
+}
+
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker describe-app --domain-id d-nehutxreazmp --space-name my-notebook --app-name default --app-type JupyterLab --region us-east-1
+{
+    "AppArn": "arn:aws:sagemaker:us-east-1:084375569056:app/d-nehutxreazmp/my-notebook/JupyterLab/default",
+    "AppType": "JupyterLab",
+    "AppName": "default",
+    "DomainId": "d-nehutxreazmp",
+    "SpaceName": "my-notebook",
+    "Status": "InService",
+    "LastHealthCheckTimestamp": "2025-05-20T13:04:25.116000-07:00",
+    "LastUserActivityTimestamp": "2025-05-20T13:04:25.116000-07:00",
+    "CreationTime": "2025-05-20T13:04:25.055000-07:00",
+    "ResourceSpec": {
+        "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:885854791233:image/sagemaker-distribution-cpu",
+        "SageMakerImageVersionAlias": "3.0.1",
+        "InstanceType": "ml.t3.medium"
+    }
+}
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker describe-app --domain-id d-nehutxreazmp --space-name customer-churn --app-name default --app-type JupyterLab --region us-east-1
+{
+    "AppArn": "arn:aws:sagemaker:us-east-1:084375569056:app/d-nehutxreazmp/customer-churn/JupyterLab/default",
+    "AppType": "JupyterLab",
+    "AppName": "default",
+    "DomainId": "d-nehutxreazmp",
+    "SpaceName": "customer-churn",
+    "Status": "InService",
+    "LastHealthCheckTimestamp": "2025-05-20T13:29:25.206000-07:00",
+    "LastUserActivityTimestamp": "2025-05-20T13:29:25.206000-07:00",
+    "CreationTime": "2025-05-20T13:00:58.630000-07:00",
+    "ResourceSpec": {
+        "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:885854791233:image/sagemaker-distribution-cpu",
+        "SageMakerImageVersionAlias": "3.0.1",
+        "InstanceType": "ml.t3.medium"
+    }
+}
+

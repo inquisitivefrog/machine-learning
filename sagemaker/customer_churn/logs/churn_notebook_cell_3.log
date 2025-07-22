@@ -1,0 +1,9 @@
+
+INFO:sagemaker:Creating model with name: xgboost-2025-05-28-01-24-25-795
+INFO:sagemaker:Creating endpoint-config with name xgboost-2025-05-28-01-24-25-795
+INFO:sagemaker:Creating endpoint with name xgboost-2025-05-28-01-24-25-795
+------------!
+INFO:sagemaker:Deleting endpoint configuration with name: xgboost-2025-05-28-01-24-25-795
+INFO:sagemaker:Deleting endpoint with name: xgboost-2025-05-28-01-24-25-795
+
+NOTE: you know your done when Python 3 (ipykernel) says Idle not Busy

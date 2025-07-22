@@ -1,0 +1,102 @@
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker describe-domain --domain-id d-nehutxreazmp --region us-east-1
+{
+    "DomainArn": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-nehutxreazmp",
+    "DomainId": "d-nehutxreazmp",
+    "DomainName": "QuickSetupDomain-20250520T093900",
+    "HomeEfsFileSystemId": "fs-048700fc8ac286ea8",
+    "Status": "InService",
+    "CreationTime": "2025-05-20T09:40:01.069000-07:00",
+    "LastModifiedTime": "2025-05-20T09:41:59.213000-07:00",
+    "AuthMode": "IAM",
+    "DefaultUserSettings": {
+        "ExecutionRole": "arn:aws:iam::084375569056:role/service-role/AmazonSageMaker-ExecutionRole-20250520T093901",
+        "SharingSettings": {
+            "NotebookOutputOption": "Allowed",
+            "S3OutputPath": "s3://sagemaker-studio-084375569056-lhlbozhzvv/sharing"
+        },
+        "JupyterServerAppSettings": {
+            "DefaultResourceSpec": {
+                "SageMakerImageArn": "arn:aws:sagemaker:us-east-1:081325390199:image/jupyter-server-3",
+                "InstanceType": "system"
+            }
+        },
+        "CanvasAppSettings": {
+            "GenerativeAiSettings": {
+                "AmazonBedrockRoleArn": "arn:aws:iam::084375569056:role/service-role/AmazonSagemakerCanvasBedrockRole-20250520T093900"
+            },
+            "EmrServerlessSettings": {
+                "ExecutionRoleArn": "arn:aws:iam::084375569056:role/service-role/AmazonSageMakerCanvasEMRSExecutionAccess-20250520T093900",
+                "Status": "ENABLED"
+            }
+        },
+        "DefaultLandingUri": "studio::",
+        "StudioWebPortal": "ENABLED",
+        "StudioWebPortalSettings": {
+            "HiddenAppTypes": [
+                "JupyterServer"
+            ]
+        },
+        "AutoMountHomeEFS": "Enabled"
+    },
+    "AppNetworkAccessType": "PublicInternetOnly",
+    "SubnetIds": [
+        "subnet-022f529a1e45cbd9e",
+        "subnet-0b74f4426cec96c10",
+        "subnet-09a51c993c01450b7",
+        "subnet-02fa4439bbae7c5a8",
+        "subnet-0e3b525ee2500c7f4",
+        "subnet-08c7a7a0adb46cc83"
+    ],
+    "Url": "https://d-nehutxreazmp.studio.us-east-1.sagemaker.aws",
+    "VpcId": "vpc-0d76268d482855884",
+    "TagPropagation": "DISABLED",
+    "DefaultSpaceSettings": {
+        "ExecutionRole": "arn:aws:iam::084375569056:role/service-role/AmazonSageMaker-ExecutionRole-20250520T093901"
+    }
+}
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-domains --region us-east-1
+{
+    "Domains": [
+        {
+            "DomainArn": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-nehutxreazmp",
+            "DomainId": "d-nehutxreazmp",
+            "DomainName": "QuickSetupDomain-20250520T093900",
+            "Status": "InService",
+            "CreationTime": "2025-05-20T09:40:01.069000-07:00",
+            "LastModifiedTime": "2025-05-20T09:41:59.213000-07:00",
+            "Url": "https://d-nehutxreazmp.studio.us-east-1.sagemaker.aws"
+        }
+    ]
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-endpoints --region us-east-1
+{
+    "Endpoints": []
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws sagemaker list-endpoint-configs --region us-east-1 
+{
+    "EndpointConfigs": [
+        {
+            "EndpointConfigName": "sagemaker-xgboost-2025-05-16-18-14-07-995",
+            "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:084375569056:endpoint-config/sagemaker-xgboost-2025-05-16-18-14-07-995",
+            "CreationTime": "2025-05-16T11:14:08.971000-07:00"
+        },
+        {
+            "EndpointConfigName": "sagemaker-xgboost-2025-05-16-17-00-16-559",
+            "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:084375569056:endpoint-config/sagemaker-xgboost-2025-05-16-17-00-16-559",
+            "CreationTime": "2025-05-16T10:00:17.504000-07:00"
+        },
+        {
+            "EndpointConfigName": "sagemaker-xgboost-2025-05-15-22-06-31-961",
+            "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:084375569056:endpoint-config/sagemaker-xgboost-2025-05-15-22-06-31-961",
+            "CreationTime": "2025-05-15T15:06:32.867000-07:00"
+        },
+        {
+            "EndpointConfigName": "sagemaker-xgboost-2025-05-15-21-52-07-049",
+            "EndpointConfigArn": "arn:aws:sagemaker:us-east-1:084375569056:endpoint-config/sagemaker-xgboost-2025-05-15-21-52-07-049",
+            "CreationTime": "2025-05-15T14:52:07.994000-07:00"
+        }
+    ]
+}
+

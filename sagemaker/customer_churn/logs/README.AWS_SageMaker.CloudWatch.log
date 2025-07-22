@@ -1,0 +1,23 @@
+
+(py3ml) tim@Tims-MBP customer_churn % aws logs create-log-group --log-group-name /aws/sagemaker/Studio/d-nehutxreazmp --region us-east-1
+(py3ml) tim@Tims-MBP customer_churn % 
+
+(py3ml) tim@Tims-MBP customer_churn % aws logs describe-log-groups --log-group-name-prefix /aws/sagemaker/Studio --region us-east-1
+{
+    "logGroups": [
+        {
+            "logGroupName": "/aws/sagemaker/Studio/d-nehutxreazmp",
+            "creationTime": 1747773451777,
+            "metricFilterCount": 0,
+            "arn": "arn:aws:logs:us-east-1:084375569056:log-group:/aws/sagemaker/Studio/d-nehutxreazmp:*",
+            "storedBytes": 0,
+            "logGroupClass": "STANDARD",
+            "logGroupArn": "arn:aws:logs:us-east-1:084375569056:log-group:/aws/sagemaker/Studio/d-nehutxreazmp"
+        }
+    ]
+}
+(py3ml) tim@Tims-MBP customer_churn % aws logs describe-log-streams --log-group-name /aws/sagemaker/Studio/d-nehutxreazmp --region us-east-1
+{
+    "logStreams": []
+}
+

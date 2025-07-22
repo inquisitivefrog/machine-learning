@@ -1,0 +1,133 @@
+
+(py3ml) tim@Tims-MBP customer_churn % aws iam get-role --role-name AmazonSageMaker-ExecutionRole-20250520T093901 --region us-east-1
+{
+    "Role": {
+        "Path": "/service-role/",
+        "RoleName": "AmazonSageMaker-ExecutionRole-20250520T093901",
+        "RoleId": "AROARHJJNAKQKLJBLLQ7H",
+        "Arn": "arn:aws:iam::084375569056:role/service-role/AmazonSageMaker-ExecutionRole-20250520T093901",
+        "CreateDate": "2025-05-20T16:39:55+00:00",
+        "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": "sagemaker.amazonaws.com"
+                    },
+                    "Action": "sts:AssumeRole"
+                }
+            ]
+        },
+        "Description": "SageMaker execution role created from the SageMaker AWS Management Console.",
+        "MaxSessionDuration": 3600,
+        "RoleLastUsed": {}
+    }
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws iam list-attached-role-policies --role-name AmazonSageMaker-ExecutionRole-20250520T093901 --region us-east-1
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AmazonSageMakerFullAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasSMDataScienceAssistantAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasSMDataScienceAssistantAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasAIServicesAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasAIServicesAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasFullAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasFullAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasDataPrepFullAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasDataPrepFullAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMaker-ExecutionPolicy-20250520T093901",
+            "PolicyArn": "arn:aws:iam::084375569056:policy/service-role/AmazonSageMaker-ExecutionPolicy-20250520T093901"
+        }
+    ]
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws iam list-attached-role-policies --role-name AmazonSageMaker-ExecutionRole-20250520T093901 --region us-east-1
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AmazonSageMakerFullAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasSMDataScienceAssistantAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasSMDataScienceAssistantAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasAIServicesAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasAIServicesAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasFullAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasFullAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMakerCanvasDataPrepFullAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonSageMakerCanvasDataPrepFullAccess"
+        },
+        {
+            "PolicyName": "AmazonSageMaker-ExecutionPolicy-20250520T093901",
+            "PolicyArn": "arn:aws:iam::084375569056:policy/service-role/AmazonSageMaker-ExecutionPolicy-20250520T093901"
+        }
+    ]
+}
+
+(py3ml) tim@Tims-MBP customer_churn % aws iam list-user-policies --user-name bluedragon --region us-east-1
+{
+    "PolicyNames": [
+        "BraketSearchJobs"
+    ]
+}
+(py3ml) tim@Tims-MBP customer_churn % aws iam list-attached-user-policies --user-name bluedragon --region us-east-1
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AdministratorAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AdministratorAccess"
+        },
+        {
+            "PolicyName": "AmazonEKSClusterPolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+        },
+        {
+            "PolicyName": "IAMUserChangePassword",
+            "PolicyArn": "arn:aws:iam::aws:policy/IAMUserChangePassword"
+        },
+        {
+            "PolicyName": "AmazonEKSWorkerNodePolicy",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+        }
+    ]
+}
+
+echo '{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "cloudwatch:PutMetricData"
+      ],
+      "Resource": "*"
+    }
+  ]
+}' > sagemaker-logging-policy.json
+aws iam put-role-policy --role-name AmazonSageMaker-ExecutionRole-20250520T093901 --policy-name SageMakerLoggingAccess --policy-document file://sagemaker-logging-policy.json
+
+

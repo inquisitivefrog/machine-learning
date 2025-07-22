@@ -1,0 +1,221 @@
+
+INFO:sagemaker.image_uris:Ignoring unnecessary instance type: None.
+INFO:sagemaker.telemetry.telemetry_logging:SageMaker Python SDK will collect telemetry to help us better understand our user's needs, diagnose issues, and deliver additional features.
+To opt out of telemetry, please disable via TelemetryOptOut parameter in SDK defaults config. For more information, refer to https://sagemaker.readthedocs.io/en/stable/overview.html#configuring-and-using-defaults-with-the-sagemaker-python-sdk.
+INFO:sagemaker:Creating training-job with name: xgboost-2025-05-28-01-19-12-702
+2025-05-28 01:19:14 Starting - Starting the training job...
+2025-05-28 01:19:29 Starting - Preparing the instances for training...
+2025-05-28 01:19:49 Downloading - Downloading input data...
+2025-05-28 01:20:34 Downloading - Downloading the training image...
+2025-05-28 01:21:15 Training - Training image download completed. Training in progress..Arguments: train
+[2025-05-28:01:21:19:INFO] Running standalone xgboost training.
+[2025-05-28:01:21:19:INFO] Path /opt/ml/input/data/validation does not exist!
+[2025-05-28:01:21:19:INFO] File size need to be processed in the node: 0.32mb. Available memory size in the node: 341.33mb
+[2025-05-28:01:21:19:INFO] Determined delimiter of CSV input is ','
+[01:21:19] S3DistributionType set as FullyReplicated
+[01:21:19] 7043x19 matrix with 133817 entries loaded from /opt/ml/input/data/train?format=csv&label_column=0&delimiter=,
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 36 extra nodes, 10 pruned nodes, max_depth=5
+[0]#011train-error:0.206162
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 38 extra nodes, 8 pruned nodes, max_depth=5
+[1]#011train-error:0.197359
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 32 extra nodes, 18 pruned nodes, max_depth=5
+[2]#011train-error:0.196507
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 42 extra nodes, 12 pruned nodes, max_depth=5
+[3]#011train-error:0.19168
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 32 extra nodes, 16 pruned nodes, max_depth=5
+[4]#011train-error:0.189408
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 36 extra nodes, 18 pruned nodes, max_depth=5
+[5]#011train-error:0.192106
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 36 extra nodes, 18 pruned nodes, max_depth=5
+[6]#011train-error:0.187278
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 32 extra nodes, 16 pruned nodes, max_depth=5
+[7]#011train-error:0.186994
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 34 extra nodes, 14 pruned nodes, max_depth=5
+[8]#011train-error:0.185006
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 30 extra nodes, 26 pruned nodes, max_depth=5
+[9]#011train-error:0.185432
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 30 extra nodes, 22 pruned nodes, max_depth=5
+[10]#011train-error:0.184154
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 32 extra nodes, 12 pruned nodes, max_depth=5
+[11]#011train-error:0.183445
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 30 extra nodes, 24 pruned nodes, max_depth=5
+[12]#011train-error:0.182025
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 24 extra nodes, 18 pruned nodes, max_depth=5
+[13]#011train-error:0.181883
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 22 extra nodes, 20 pruned nodes, max_depth=5
+[14]#011train-error:0.182451
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 28 extra nodes, 22 pruned nodes, max_depth=5
+[15]#011train-error:0.181173
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 28 extra nodes, 14 pruned nodes, max_depth=5
+[16]#011train-error:0.179895
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 20 extra nodes, 16 pruned nodes, max_depth=5
+[17]#011train-error:0.179895
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 26 extra nodes, 16 pruned nodes, max_depth=5
+[18]#011train-error:0.179043
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 18 extra nodes, 10 pruned nodes, max_depth=5
+[19]#011train-error:0.178759
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 26 extra nodes, 14 pruned nodes, max_depth=5
+[20]#011train-error:0.178759
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 16 extra nodes, 26 pruned nodes, max_depth=5
+[21]#011train-error:0.178191
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 20 pruned nodes, max_depth=4
+[22]#011train-error:0.176913
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 14 pruned nodes, max_depth=5
+[23]#011train-error:0.177197
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 22 extra nodes, 6 pruned nodes, max_depth=5
+[24]#011train-error:0.177339
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 16 pruned nodes, max_depth=5
+[25]#011train-error:0.176061
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 28 extra nodes, 18 pruned nodes, max_depth=5
+[26]#011train-error:0.175067
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 24 extra nodes, 10 pruned nodes, max_depth=5
+[27]#011train-error:0.174925
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 18 extra nodes, 20 pruned nodes, max_depth=4
+[28]#011train-error:0.174783
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 22 extra nodes, 22 pruned nodes, max_depth=5
+[29]#011train-error:0.174925
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 18 extra nodes, 14 pruned nodes, max_depth=5
+[30]#011train-error:0.17379
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 16 extra nodes, 12 pruned nodes, max_depth=5
+[31]#011train-error:0.17308
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 30 extra nodes, 10 pruned nodes, max_depth=5
+[32]#011train-error:0.172228
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 12 pruned nodes, max_depth=5
+[33]#011train-error:0.172228
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 8 extra nodes, 22 pruned nodes, max_depth=4
+[34]#011train-error:0.172938
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 16 extra nodes, 16 pruned nodes, max_depth=5
+[35]#011train-error:0.172512
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 18 extra nodes, 12 pruned nodes, max_depth=5
+[36]#011train-error:0.171944
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 20 extra nodes, 10 pruned nodes, max_depth=5
+[37]#011train-error:0.172228
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 10 pruned nodes, max_depth=5
+[38]#011train-error:0.171092
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 18 pruned nodes, max_depth=0
+[39]#011train-error:0.171376
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 26 extra nodes, 14 pruned nodes, max_depth=5
+[40]#011train-error:0.171234
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 6 extra nodes, 30 pruned nodes, max_depth=3
+[41]#011train-error:0.171092
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 24 extra nodes, 16 pruned nodes, max_depth=5
+[42]#011train-error:0.170666
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 18 pruned nodes, max_depth=0
+[43]#011train-error:0.170666
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 8 extra nodes, 14 pruned nodes, max_depth=4
+[44]#011train-error:0.170666
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 24 extra nodes, 16 pruned nodes, max_depth=5
+[45]#011train-error:0.169246
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 26 extra nodes, 14 pruned nodes, max_depth=5
+[46]#011train-error:0.168394
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 6 pruned nodes, max_depth=5
+[47]#011train-error:0.168394
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 18 extra nodes, 36 pruned nodes, max_depth=5
+[48]#011train-error:0.16811
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 16 pruned nodes, max_depth=0
+[49]#011train-error:0.167968
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 10 pruned nodes, max_depth=0
+[50]#011train-error:0.168252
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 22 pruned nodes, max_depth=0
+[51]#011train-error:0.168394
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 28 extra nodes, 8 pruned nodes, max_depth=5
+[52]#011train-error:0.166832
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 12 extra nodes, 30 pruned nodes, max_depth=5
+[53]#011train-error:0.16669
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 20 pruned nodes, max_depth=3
+[54]#011train-error:0.166832
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 22 extra nodes, 14 pruned nodes, max_depth=5
+[55]#011train-error:0.166264
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 16 extra nodes, 18 pruned nodes, max_depth=5
+[56]#011train-error:0.16598
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 16 pruned nodes, max_depth=0
+[57]#011train-error:0.165838
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 32 pruned nodes, max_depth=5
+[58]#011train-error:0.16598
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 18 extra nodes, 18 pruned nodes, max_depth=5
+[59]#011train-error:0.166406
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 18 pruned nodes, max_depth=5
+[60]#011train-error:0.164845
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 26 pruned nodes, max_depth=0
+[61]#011train-error:0.164845
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 18 pruned nodes, max_depth=5
+[62]#011train-error:0.163283
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 20 extra nodes, 22 pruned nodes, max_depth=5
+[63]#011train-error:0.162999
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 12 extra nodes, 18 pruned nodes, max_depth=4
+[64]#011train-error:0.162431
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 20 pruned nodes, max_depth=0
+[65]#011train-error:0.162431
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 18 pruned nodes, max_depth=0
+[66]#011train-error:0.162431
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 6 extra nodes, 24 pruned nodes, max_depth=3
+[67]#011train-error:0.162147
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 32 extra nodes, 14 pruned nodes, max_depth=5
+[68]#011train-error:0.161863
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 14 pruned nodes, max_depth=5
+[69]#011train-error:0.160443
+[01:21:19] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 12 pruned nodes, max_depth=0
+[70]#011train-error:0.161011
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 32 pruned nodes, max_depth=5
+[71]#011train-error:0.160869
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 6 extra nodes, 24 pruned nodes, max_depth=3
+[72]#011train-error:0.160585
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 12 pruned nodes, max_depth=4
+[73]#011train-error:0.160443
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 16 pruned nodes, max_depth=0
+[74]#011train-error:0.160585
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 22 extra nodes, 18 pruned nodes, max_depth=5
+[75]#011train-error:0.159165
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 12 extra nodes, 16 pruned nodes, max_depth=4
+[76]#011train-error:0.159591
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 22 extra nodes, 26 pruned nodes, max_depth=5
+[77]#011train-error:0.160159
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 16 pruned nodes, max_depth=0
+[78]#011train-error:0.160159
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 26 pruned nodes, max_depth=0
+[79]#011train-error:0.160017
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 40 pruned nodes, max_depth=0
+[80]#011train-error:0.159875
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 6 pruned nodes, max_depth=5
+[81]#011train-error:0.159449
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 44 pruned nodes, max_depth=0
+[82]#011train-error:0.160159
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 12 pruned nodes, max_depth=0
+[83]#011train-error:0.160017
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 22 pruned nodes, max_depth=0
+[84]#011train-error:0.159449
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 24 pruned nodes, max_depth=0
+[85]#011train-error:0.160159
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 20 pruned nodes, max_depth=0
+[86]#011train-error:0.160159
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 22 pruned nodes, max_depth=0
+[87]#011train-error:0.160017
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 8 extra nodes, 16 pruned nodes, max_depth=4
+[88]#011train-error:0.159733
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 8 extra nodes, 14 pruned nodes, max_depth=4
+[89]#011train-error:0.159733
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 24 pruned nodes, max_depth=0
+[90]#011train-error:0.160017
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 6 extra nodes, 32 pruned nodes, max_depth=3
+[91]#011train-error:0.158313
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 18 pruned nodes, max_depth=5
+[92]#011train-error:0.158739
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 16 pruned nodes, max_depth=5
+[93]#011train-error:0.158881
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 14 extra nodes, 14 pruned nodes, max_depth=4
+[94]#011train-error:0.158029
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 6 extra nodes, 10 pruned nodes, max_depth=3
+[95]#011train-error:0.157887
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 12 extra nodes, 8 pruned nodes, max_depth=5
+[96]#011train-error:0.157461
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 12 extra nodes, 20 pruned nodes, max_depth=5
+[97]#011train-error:0.158171
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 10 extra nodes, 24 pruned nodes, max_depth=5
+[98]#011train-error:0.158029
+[01:21:20] src/tree/updater_prune.cc:74: tree pruning end, 1 roots, 0 extra nodes, 12 pruned nodes, max_depth=0
+[99]#011train-error:0.158029
+
+2025-05-28 01:21:44 Uploading - Uploading generated training model
+2025-05-28 01:21:44 Completed - Training job completed
+Training seconds: 114
+Billable seconds: 114

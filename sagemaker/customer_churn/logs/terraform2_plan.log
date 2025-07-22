@@ -1,0 +1,449 @@
+
+tim@Tims-MBP terraform2 % pwd                           
+/Users/tim/Documents/workspace/python3/machine-learning/sagemaker/customer_churn/terraform2
+tim@Tims-MBP terraform2 % terraform plan -out=tfplan
+data.aws_caller_identity.current: Reading...
+module.vpc.data.aws_availability_zones.available: Reading...
+module.iam.aws_iam_role.sagemaker_role: Refreshing state... [id=SageMakerExecutionRole]
+module.vpc.aws_vpc.main: Refreshing state... [id=vpc-0bc8ab9f1172da26b]
+module.s3.aws_s3_bucket.main: Refreshing state... [id=sagemaker-customer-churn-20250530]
+data.aws_caller_identity.current: Read complete after 0s [id=084375569056]
+module.vpc.data.aws_availability_zones.available: Read complete after 0s [id=us-east-1]
+module.iam.aws_iam_role_policy_attachment.sagemaker_full_access: Refreshing state... [id=SageMakerExecutionRole-20250530184621931400000002]
+module.iam.aws_iam_role_policy.s3_access: Refreshing state... [id=SageMakerExecutionRole:terraform-20250530184621786800000001]
+module.vpc.aws_subnet.main[0]: Refreshing state... [id=subnet-05f099a6880fb27c5]
+module.vpc.aws_security_group.sagemaker_sg: Refreshing state... [id=sg-03c3deef63c6e01c1]
+module.s3.aws_s3_bucket_ownership_controls.main: Refreshing state... [id=sagemaker-customer-churn-20250530]
+module.s3.aws_s3_bucket_acl.main: Refreshing state... [id=sagemaker-customer-churn-20250530,private]
+
+Terraform used the selected providers to generate the following execution plan. Resource actions are indicated
+with the following symbols:
+  + create
+  ~ update in-place
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # aws_kms_key.sagemaker_key will be created
+  + resource "aws_kms_key" "sagemaker_key" {
+      + arn                                = (known after apply)
+      + bypass_policy_lockout_safety_check = false
+      + customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+      + description                        = "KMS key for SageMaker EFS and S3"
+      + enable_key_rotation                = true
+      + id                                 = (known after apply)
+      + is_enabled                         = true
+      + key_id                             = (known after apply)
+      + key_usage                          = "ENCRYPT_DECRYPT"
+      + multi_region                       = (known after apply)
+      + policy                             = (known after apply)
+      + rotation_period_in_days            = (known after apply)
+      + tags_all                           = (known after apply)
+    }
+
+  # aws_kms_key_policy.sagemaker_key_policy will be created
+  + resource "aws_kms_key_policy" "sagemaker_key_policy" {
+      + bypass_policy_lockout_safety_check = false
+      + id                                 = (known after apply)
+      + key_id                             = (known after apply)
+      + policy                             = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "kms:*"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + AWS = "arn:aws:iam::084375569056:root"
+                        }
+                      + Resource  = "*"
+                    },
+                  + {
+                      + Action    = [
+                          + "kms:Encrypt",
+                          + "kms:Decrypt",
+                          + "kms:GenerateDataKey",
+                        ]
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + AWS = "arn:aws:iam::084375569056:role/SageMakerExecutionRole"
+                        }
+                      + Resource  = "*"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+    }
+
+  # module.sagemaker.aws_sagemaker_domain.main will be created
+  + resource "aws_sagemaker_domain" "main" {
+      + app_network_access_type                        = "PublicInternetOnly"
+      + arn                                            = (known after apply)
+      + auth_mode                                      = "IAM"
+      + domain_name                                    = "ImaginaryOrgDomain"
+      + home_efs_file_system_id                        = (known after apply)
+      + id                                             = (known after apply)
+      + kms_key_id                                     = (known after apply)
+      + security_group_id_for_domain_boundary          = (known after apply)
+      + single_sign_on_application_arn                 = (known after apply)
+      + single_sign_on_managed_application_instance_id = (known after apply)
+      + subnet_ids                                     = (known after apply)
+      + tag_propagation                                = "DISABLED"
+      + tags_all                                       = (known after apply)
+      + url                                            = (known after apply)
+      + vpc_id                                         = "vpc-0bc8ab9f1172da26b"
+
+      + default_space_settings {
+          + execution_role  = "arn:aws:iam::084375569056:role/SageMakerExecutionRole"
+          + security_groups = (known after apply)
+
+          + jupyter_server_app_settings {
+              + default_resource_spec {
+                  + instance_type = "ml.t3.medium"
+                }
+            }
+
+          + space_storage_settings (known after apply)
+        }
+
+      + default_user_settings {
+          + auto_mount_home_efs = (known after apply)
+          + default_landing_uri = (known after apply)
+          + execution_role      = "arn:aws:iam::084375569056:role/SageMakerExecutionRole"
+          + security_groups     = (known after apply)
+          + studio_web_portal   = (known after apply)
+
+          + jupyter_server_app_settings {
+              + default_resource_spec {
+                  + instance_type = "ml.t3.medium"
+                }
+            }
+
+          + space_storage_settings (known after apply)
+        }
+
+      + domain_settings {
+          + security_group_ids = (known after apply)
+        }
+    }
+
+  # module.sagemaker.aws_sagemaker_space.space_1 will be created
+  + resource "aws_sagemaker_space" "space_1" {
+      + arn                      = (known after apply)
+      + domain_id                = (known after apply)
+      + home_efs_file_system_uid = (known after apply)
+      + id                       = (known after apply)
+      + space_name               = "space-1"
+      + tags_all                 = (known after apply)
+      + url                      = (known after apply)
+
+      + space_settings {
+          + jupyter_server_app_settings {
+              + default_resource_spec {
+                  + instance_type = "ml.t3.medium"
+                }
+            }
+          + space_storage_settings (known after apply)
+        }
+    }
+
+  # module.sagemaker.aws_sagemaker_space.space_2 will be created
+  + resource "aws_sagemaker_space" "space_2" {
+      + arn                      = (known after apply)
+      + domain_id                = (known after apply)
+      + home_efs_file_system_uid = (known after apply)
+      + id                       = (known after apply)
+      + space_name               = "space-2"
+      + tags_all                 = (known after apply)
+      + url                      = (known after apply)
+
+      + space_settings {
+          + jupyter_server_app_settings {
+              + default_resource_spec {
+                  + instance_type = "ml.t3.medium"
+                }
+            }
+          + space_storage_settings (known after apply)
+        }
+    }
+
+  # module.sagemaker.aws_sagemaker_user_profile.main will be created
+  + resource "aws_sagemaker_user_profile" "main" {
+      + arn                      = (known after apply)
+      + domain_id                = (known after apply)
+      + home_efs_file_system_uid = (known after apply)
+      + id                       = (known after apply)
+      + tags_all                 = (known after apply)
+      + user_profile_name        = "bluedragon"
+    }
+
+  # module.vpc.aws_security_group.sagemaker_sg must be replaced
+-/+ resource "aws_security_group" "sagemaker_sg" {
+      ~ arn                    = "arn:aws:ec2:us-east-1:084375569056:security-group/sg-03c3deef63c6e01c1" -> (known after apply)
+      ~ description            = "Managed by Terraform" -> "Security group for SageMaker Studio in VPC Only mode" # forces replacement
+      ~ egress                 = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - from_port        = 0
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "-1"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 0
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + cidr_blocks      = [
+                  + "10.0.0.0/16",
+                ]
+              + description      = "Allow outbound traffic within VPC"
+              + from_port        = 0
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "-1"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 0
+            },
+        ]
+      ~ id                     = "sg-03c3deef63c6e01c1" -> (known after apply)
+      ~ ingress                = [
+          - {
+              - cidr_blocks      = [
+                  - "0.0.0.0/0",
+                ]
+              - from_port        = 443
+              - ipv6_cidr_blocks = []
+              - prefix_list_ids  = []
+              - protocol         = "tcp"
+              - security_groups  = []
+              - self             = false
+              - to_port          = 443
+                # (1 unchanged attribute hidden)
+            },
+          + {
+              + cidr_blocks      = [
+                  + "10.0.0.0/16",
+                ]
+              + description      = "Allow NFS traffic for SageMaker Studio EFS"
+              + from_port        = 2049
+              + ipv6_cidr_blocks = []
+              + prefix_list_ids  = []
+              + protocol         = "tcp"
+              + security_groups  = []
+              + self             = false
+              + to_port          = 2049
+            },
+        ]
+      ~ name                   = "sagemaker-security-group" -> "imaginary-org-vpc-sagemaker-sg" # forces replacement
+      + name_prefix            = (known after apply)
+      ~ owner_id               = "084375569056" -> (known after apply)
+      ~ tags                   = {
+          ~ "Name" = "sagemaker-sg" -> "imaginary-org-vpc-sagemaker-sg"
+        }
+      ~ tags_all               = {
+          ~ "Name" = "sagemaker-sg" -> "imaginary-org-vpc-sagemaker-sg"
+        }
+        # (2 unchanged attributes hidden)
+    }
+
+  # module.vpc.aws_subnet.main[0] must be replaced
+  # (moved from module.vpc.aws_subnet.main)
+-/+ resource "aws_subnet" "main" {
+      ~ arn                                            = "arn:aws:ec2:us-east-1:084375569056:subnet/subnet-05f099a6880fb27c5" -> (known after apply)
+      ~ availability_zone                              = "us-east-1f" -> "us-east-1a" # forces replacement
+      ~ availability_zone_id                           = "use1-az5" -> (known after apply)
+      - enable_lni_at_device_index                     = 0 -> null
+      ~ id                                             = "subnet-05f099a6880fb27c5" -> (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      - map_customer_owned_ip_on_launch                = false -> null
+      ~ owner_id                                       = "084375569056" -> (known after apply)
+      ~ private_dns_hostname_type_on_launch            = "ip-name" -> (known after apply)
+      ~ tags                                           = {
+          ~ "Name" = "sagemaker-subnet" -> "imaginary-org-vpc-subnet-1"
+        }
+      ~ tags_all                                       = {
+          ~ "Name" = "sagemaker-subnet" -> "imaginary-org-vpc-subnet-1"
+        }
+        # (11 unchanged attributes hidden)
+    }
+
+  # module.vpc.aws_subnet.main[1] will be created
+  + resource "aws_subnet" "main" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1b"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.0.2.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name" = "imaginary-org-vpc-subnet-2"
+        }
+      + tags_all                                       = {
+          + "Name" = "imaginary-org-vpc-subnet-2"
+        }
+      + vpc_id                                         = "vpc-0bc8ab9f1172da26b"
+    }
+
+  # module.vpc.aws_subnet.main[2] will be created
+  + resource "aws_subnet" "main" {
+      + arn                                            = (known after apply)
+      + assign_ipv6_address_on_creation                = false
+      + availability_zone                              = "us-east-1c"
+      + availability_zone_id                           = (known after apply)
+      + cidr_block                                     = "10.0.3.0/24"
+      + enable_dns64                                   = false
+      + enable_resource_name_dns_a_record_on_launch    = false
+      + enable_resource_name_dns_aaaa_record_on_launch = false
+      + id                                             = (known after apply)
+      + ipv6_cidr_block_association_id                 = (known after apply)
+      + ipv6_native                                    = false
+      + map_public_ip_on_launch                        = false
+      + owner_id                                       = (known after apply)
+      + private_dns_hostname_type_on_launch            = (known after apply)
+      + tags                                           = {
+          + "Name" = "imaginary-org-vpc-subnet-3"
+        }
+      + tags_all                                       = {
+          + "Name" = "imaginary-org-vpc-subnet-3"
+        }
+      + vpc_id                                         = "vpc-0bc8ab9f1172da26b"
+    }
+
+  # module.vpc.aws_vpc.main will be updated in-place
+  ~ resource "aws_vpc" "main" {
+      ~ enable_dns_hostnames                 = false -> true
+        id                                   = "vpc-0bc8ab9f1172da26b"
+      ~ tags                                 = {
+          ~ "Name" = "sagemaker-vpc" -> "imaginary-org-vpc"
+        }
+      ~ tags_all                             = {
+          ~ "Name" = "sagemaker-vpc" -> "imaginary-org-vpc"
+        }
+        # (17 unchanged attributes hidden)
+    }
+
+  # module.vpc.aws_vpc_endpoint.sagemaker_api will be created
+  + resource "aws_vpc_endpoint" "sagemaker_api" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = true
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.us-east-1.sagemaker.api"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name" = "imaginary-org-vpc-sagemaker-api-endpoint"
+        }
+      + tags_all              = {
+          + "Name" = "imaginary-org-vpc-sagemaker-api-endpoint"
+        }
+      + vpc_endpoint_type     = "Interface"
+      + vpc_id                = "vpc-0bc8ab9f1172da26b"
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+    }
+
+  # module.vpc.aws_vpc_endpoint.sagemaker_runtime will be created
+  + resource "aws_vpc_endpoint" "sagemaker_runtime" {
+      + arn                   = (known after apply)
+      + cidr_blocks           = (known after apply)
+      + dns_entry             = (known after apply)
+      + id                    = (known after apply)
+      + ip_address_type       = (known after apply)
+      + network_interface_ids = (known after apply)
+      + owner_id              = (known after apply)
+      + policy                = (known after apply)
+      + prefix_list_id        = (known after apply)
+      + private_dns_enabled   = true
+      + requester_managed     = (known after apply)
+      + route_table_ids       = (known after apply)
+      + security_group_ids    = (known after apply)
+      + service_name          = "com.amazonaws.us-east-1.sagemaker.runtime"
+      + service_region        = (known after apply)
+      + state                 = (known after apply)
+      + subnet_ids            = (known after apply)
+      + tags                  = {
+          + "Name" = "imaginary-org-vpc-sagemaker-runtime-endpoint"
+        }
+      + tags_all              = {
+          + "Name" = "imaginary-org-vpc-sagemaker-runtime-endpoint"
+        }
+      + vpc_endpoint_type     = "Interface"
+      + vpc_id                = "vpc-0bc8ab9f1172da26b"
+
+      + dns_options (known after apply)
+
+      + subnet_configuration (known after apply)
+    }
+
+Plan: 12 to add, 1 to change, 2 to destroy.
+
+Changes to Outputs:
+  + sagemaker_domain_id        = (known after apply)
+  + sagemaker_user_profile_arn = {
+      + auto_mount_home_efs              = (known after apply)
+      + canvas_app_settings              = []
+      + code_editor_app_settings         = []
+      + custom_file_system_config        = []
+      + custom_posix_user_config         = []
+      + default_landing_uri              = (known after apply)
+      + execution_role                   = "arn:aws:iam::084375569056:role/SageMakerExecutionRole"
+      + jupyter_lab_app_settings         = []
+      + jupyter_server_app_settings      = [
+          + {
+              + code_repository       = []
+              + default_resource_spec = [
+                  + {
+                      + instance_type                 = "ml.t3.medium"
+                      + lifecycle_config_arn          = null
+                      + sagemaker_image_arn           = null
+                      + sagemaker_image_version_alias = null
+                      + sagemaker_image_version_arn   = null
+                    },
+                ]
+              + lifecycle_config_arns = null
+            },
+        ]
+      + kernel_gateway_app_settings      = []
+      + r_session_app_settings           = []
+      + r_studio_server_pro_app_settings = []
+      + security_groups                  = (known after apply)
+      + sharing_settings                 = []
+      + space_storage_settings           = (known after apply)
+      + studio_web_portal                = (known after apply)
+      + studio_web_portal_settings       = []
+      + tensor_board_app_settings        = []
+    }
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "tfplan"
+tim@Tims-MBP terraform2 % 
+

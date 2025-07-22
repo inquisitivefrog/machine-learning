@@ -1,0 +1,584 @@
+
+(py3ml) tim@Tims-MBP customer_churn % aws ec2 describe-vpcs --vpc-id vpc-0d76268d482855884 --region us-east-1
+{
+    "Vpcs": [
+        {
+            "OwnerId": "084375569056",
+            "InstanceTenancy": "default",
+            "CidrBlockAssociationSet": [
+                {
+                    "AssociationId": "vpc-cidr-assoc-03e229209b07d211d",
+                    "CidrBlock": "172.31.0.0/16",
+                    "CidrBlockState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "IsDefault": true,
+            "VpcId": "vpc-0d76268d482855884",
+            "State": "available",
+            "CidrBlock": "172.31.0.0/16",
+            "DhcpOptionsId": "dopt-0ee2045fb33896509"
+        }
+    ]
+}
+
+tim@Tims-MBP  archived % aws ec2 describe-network-interfaces --region us-east-1
+{
+    "NetworkInterfaces": [
+        {
+            "Attachment": {
+                "AttachmentId": "ela-attach-024d274939352c2f0",
+                "DeleteOnTermination": false,
+                "DeviceIndex": 1,
+                "InstanceOwnerId": "amazon-aws",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1d",
+            "Description": "EFS mount target for fs-048700fc8ac286ea8 (fsmt-0f1a6b7c6b22450dc)",
+            "Groups": [
+                {
+                    "GroupId": "sg-04fe8cf028e8d2609",
+                    "GroupName": "security-group-for-inbound-nfs-d-nehutxreazmp"
+                }
+            ],
+            "InterfaceType": "efs",
+            "Ipv6Addresses": [],
+            "MacAddress": "12:09:a7:50:3a:51",
+            "NetworkInterfaceId": "eni-0adac1a540322abd8",
+            "OwnerId": "084375569056",
+            "PrivateDnsName": "ip-172-31-84-241.ec2.internal",
+            "PrivateIpAddress": "172.31.84.241",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-172-31-84-241.ec2.internal",
+                    "PrivateIpAddress": "172.31.84.241"
+                }
+            ],
+            "RequesterId": "641247547298",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-08c7a7a0adb46cc83",
+            "TagSet": [],
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "Attachment": {
+                "AttachmentId": "ela-attach-01f18bbf89aa68f3b",
+                "DeleteOnTermination": false,
+                "DeviceIndex": 1,
+                "InstanceOwnerId": "amazon-aws",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1a",
+            "Description": "EFS mount target for fs-048700fc8ac286ea8 (fsmt-0d95f43cf5710852d)",
+            "Groups": [
+                {
+                    "GroupId": "sg-04fe8cf028e8d2609",
+                    "GroupName": "security-group-for-inbound-nfs-d-nehutxreazmp"
+                }
+            ],
+            "InterfaceType": "efs",
+            "Ipv6Addresses": [],
+            "MacAddress": "0a:ff:d8:b9:6d:87",
+            "NetworkInterfaceId": "eni-0e5e2618610e465e9",
+            "OwnerId": "084375569056",
+            "PrivateDnsName": "ip-172-31-22-95.ec2.internal",
+            "PrivateIpAddress": "172.31.22.95",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-172-31-22-95.ec2.internal",
+                    "PrivateIpAddress": "172.31.22.95"
+                }
+            ],
+            "RequesterId": "641247547298",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-0e3b525ee2500c7f4",
+            "TagSet": [],
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "Attachment": {
+                "AttachmentId": "ela-attach-0166b2bf7cef5645a",
+                "DeleteOnTermination": false,
+                "DeviceIndex": 1,
+                "InstanceOwnerId": "amazon-aws",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1c",
+            "Description": "EFS mount target for fs-048700fc8ac286ea8 (fsmt-0253a76f96d048212)",
+            "Groups": [
+                {
+                    "GroupId": "sg-04fe8cf028e8d2609",
+                    "GroupName": "security-group-for-inbound-nfs-d-nehutxreazmp"
+                }
+            ],
+            "InterfaceType": "efs",
+            "Ipv6Addresses": [],
+            "MacAddress": "02:e0:18:37:2e:a1",
+            "NetworkInterfaceId": "eni-0f9bbab01718d49e4",
+            "OwnerId": "084375569056",
+            "PrivateDnsName": "ip-172-31-13-109.ec2.internal",
+            "PrivateIpAddress": "172.31.13.109",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-172-31-13-109.ec2.internal",
+                    "PrivateIpAddress": "172.31.13.109"
+                }
+            ],
+            "RequesterId": "641247547298",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-09a51c993c01450b7",
+            "TagSet": [],
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "Attachment": {
+                "AttachmentId": "ela-attach-0ee88b53dab962f37",
+                "DeleteOnTermination": false,
+                "DeviceIndex": 1,
+                "InstanceOwnerId": "amazon-aws",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1b",
+            "Description": "EFS mount target for fs-048700fc8ac286ea8 (fsmt-05ab73cbf6daf0516)",
+            "Groups": [
+                {
+                    "GroupId": "sg-04fe8cf028e8d2609",
+                    "GroupName": "security-group-for-inbound-nfs-d-nehutxreazmp"
+                }
+            ],
+            "InterfaceType": "efs",
+            "Ipv6Addresses": [],
+            "MacAddress": "0e:c8:ec:34:7d:8d",
+            "NetworkInterfaceId": "eni-068ed3585334fab5f",
+            "OwnerId": "084375569056",
+            "PrivateDnsName": "ip-172-31-41-34.ec2.internal",
+            "PrivateIpAddress": "172.31.41.34",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-172-31-41-34.ec2.internal",
+                    "PrivateIpAddress": "172.31.41.34"
+                }
+            ],
+            "RequesterId": "641247547298",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-0b74f4426cec96c10",
+            "TagSet": [],
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "Attachment": {
+                "AttachmentId": "ela-attach-0dfbb15787794821e",
+                "DeleteOnTermination": false,
+                "DeviceIndex": 1,
+                "InstanceOwnerId": "amazon-aws",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1f",
+            "Description": "EFS mount target for fs-048700fc8ac286ea8 (fsmt-03bece03f1f8780c7)",
+            "Groups": [
+                {
+                    "GroupId": "sg-04fe8cf028e8d2609",
+                    "GroupName": "security-group-for-inbound-nfs-d-nehutxreazmp"
+                }
+            ],
+            "InterfaceType": "efs",
+            "Ipv6Addresses": [],
+            "MacAddress": "16:ff:f5:0b:07:d3",
+            "NetworkInterfaceId": "eni-03b6f1a13ee05ea8c",
+            "OwnerId": "084375569056",
+            "PrivateDnsName": "ip-172-31-69-33.ec2.internal",
+            "PrivateIpAddress": "172.31.69.33",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-172-31-69-33.ec2.internal",
+                    "PrivateIpAddress": "172.31.69.33"
+                }
+            ],
+            "RequesterId": "641247547298",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-022f529a1e45cbd9e",
+            "TagSet": [],
+            "VpcId": "vpc-0d76268d482855884"
+        },
+        {
+            "Attachment": {
+                "AttachmentId": "ela-attach-07c3832f0e47407ef",
+                "DeleteOnTermination": false,
+                "DeviceIndex": 1,
+                "InstanceOwnerId": "amazon-aws",
+                "Status": "attached"
+            },
+            "AvailabilityZone": "us-east-1e",
+            "Description": "EFS mount target for fs-048700fc8ac286ea8 (fsmt-044a2c8e109574861)",
+            "Groups": [
+                {
+                    "GroupId": "sg-04fe8cf028e8d2609",
+                    "GroupName": "security-group-for-inbound-nfs-d-nehutxreazmp"
+                }
+            ],
+            "InterfaceType": "interface",
+            "Ipv6Addresses": [],
+            "MacAddress": "06:ec:a5:53:ae:c1",
+            "NetworkInterfaceId": "eni-0614c633dcac5c2e5",
+            "OwnerId": "084375569056",
+            "PrivateDnsName": "ip-172-31-59-99.ec2.internal",
+            "PrivateIpAddress": "172.31.59.99",
+            "PrivateIpAddresses": [
+                {
+                    "Primary": true,
+                    "PrivateDnsName": "ip-172-31-59-99.ec2.internal",
+                    "PrivateIpAddress": "172.31.59.99"
+                }
+            ],
+            "RequesterId": "641247547298",
+            "RequesterManaged": true,
+            "SourceDestCheck": true,
+            "Status": "in-use",
+            "SubnetId": "subnet-02fa4439bbae7c5a8",
+            "TagSet": [],
+            "VpcId": "vpc-0d76268d482855884"
+        }
+    ]
+}
+
+tim@Tims-MBP  archived % aws ec2 describe-security-groups --region us-east-1
+{
+    "SecurityGroups": [
+        {
+            "GroupId": "sg-0801ba9a7f124056b",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "ManagedByAmazonSageMakerResource",
+                    "Value": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-3rxdb5dhdqly"
+                }
+            ],
+            "VpcId": "vpc-0d76268d482855884",
+            "OwnerId": "084375569056",
+            "GroupName": "security-group-for-inbound-nfs-d-3rxdb5dhdqly",
+            "Description": "[DO NOT DELETE] Security Group that allows inbound NFS traffic for SageMaker Notebooks Domain [d-3rxdb5dhdqly]",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 988,
+                    "ToPort": 988,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-06269d4c615ef558c"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 1018,
+                    "ToPort": 1023,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-06269d4c615ef558c"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 2049,
+                    "ToPort": 2049,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-06269d4c615ef558c"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        },
+        {
+            "GroupId": "sg-04fe8cf028e8d2609",
+            "IpPermissionsEgress": [],
+            "Tags": [
+                {
+                    "Key": "ManagedByAmazonSageMakerResource",
+                    "Value": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-nehutxreazmp"
+                }
+            ],
+            "VpcId": "vpc-0d76268d482855884",
+            "OwnerId": "084375569056",
+            "GroupName": "security-group-for-inbound-nfs-d-nehutxreazmp",
+            "Description": "[DO NOT DELETE] Security Group that allows inbound NFS traffic for SageMaker Notebooks Domain [d-nehutxreazmp]",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 988,
+                    "ToPort": 988,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-081567a9e6591ea94"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 1018,
+                    "ToPort": 1023,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-081567a9e6591ea94"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 2049,
+                    "ToPort": 2049,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-081567a9e6591ea94"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        },
+        {
+            "GroupId": "sg-05986ebaa8a13db4a",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [],
+                    "IpRanges": [
+                        {
+                            "CidrIp": "0.0.0.0/0"
+                        }
+                    ],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "VpcId": "vpc-0d76268d482855884",
+            "OwnerId": "084375569056",
+            "GroupName": "default",
+            "Description": "default VPC security group",
+            "IpPermissions": [
+                {
+                    "IpProtocol": "-1",
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-05986ebaa8a13db4a"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ]
+        },
+        {
+            "GroupId": "sg-081567a9e6591ea94",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 988,
+                    "ToPort": 988,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-04fe8cf028e8d2609"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 1018,
+                    "ToPort": 1023,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-04fe8cf028e8d2609"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 2049,
+                    "ToPort": 2049,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-04fe8cf028e8d2609"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "ManagedByAmazonSageMakerResource",
+                    "Value": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-nehutxreazmp"
+                }
+            ],
+            "VpcId": "vpc-0d76268d482855884",
+            "OwnerId": "084375569056",
+            "GroupName": "security-group-for-outbound-nfs-d-nehutxreazmp",
+            "Description": "[DO NOT DELETE] Security Group that allows outbound NFS traffic for SageMaker Notebooks Domain [d-nehutxreazmp]",
+            "IpPermissions": []
+        },
+        {
+            "GroupId": "sg-06269d4c615ef558c",
+            "IpPermissionsEgress": [
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 988,
+                    "ToPort": 988,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-0801ba9a7f124056b"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 1018,
+                    "ToPort": 1023,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-0801ba9a7f124056b"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                },
+                {
+                    "IpProtocol": "tcp",
+                    "FromPort": 2049,
+                    "ToPort": 2049,
+                    "UserIdGroupPairs": [
+                        {
+                            "UserId": "084375569056",
+                            "GroupId": "sg-0801ba9a7f124056b"
+                        }
+                    ],
+                    "IpRanges": [],
+                    "Ipv6Ranges": [],
+                    "PrefixListIds": []
+                }
+            ],
+            "Tags": [
+                {
+                    "Key": "ManagedByAmazonSageMakerResource",
+                    "Value": "arn:aws:sagemaker:us-east-1:084375569056:domain/d-3rxdb5dhdqly"
+                }
+            ],
+            "VpcId": "vpc-0d76268d482855884",
+            "OwnerId": "084375569056",
+            "GroupName": "security-group-for-outbound-nfs-d-3rxdb5dhdqly",
+            "Description": "[DO NOT DELETE] Security Group that allows outbound NFS traffic for SageMaker Notebooks Domain [d-3rxdb5dhdqly]",
+            "IpPermissions": []
+        }
+    ]
+}
+
+(py3ml) tim@Tims-MBP customer_churn % curl -I https://d-nehutxreazmp.studio.us-east-1.sagemaker.aws
+HTTP/1.1 403 Forbidden
+
+(py3ml) tim@Tims-MBP customer_churn % nslookup d-nehutxreazmp.studio.us-east-1.sagemaker.aws
+Server:		2001:5a8:49cc:8700:b675:eff:fe3a:b86f
+Address:	2001:5a8:49cc:8700:b675:eff:fe3a:b86f#53
+
+Non-authoritative answer:
+d-nehutxreazmp.studio.us-east-1.sagemaker.aws	canonical name = studio.us-east-1.sagemaker.aws.
+Name:	studio.us-east-1.sagemaker.aws
+Address: 54.84.43.253
+Name:	studio.us-east-1.sagemaker.aws
+Address: 52.3.178.55
+Name:	studio.us-east-1.sagemaker.aws
+Address: 3.234.203.54
+
+(py3ml) tim@Tims-MBP customer_churn % aws ec2 describe-route-tables --filters Name=vpc-id,Values=vpc-0d76268d482855884 --region us-east-1
+{
+    "RouteTables": [
+        {
+            "Associations": [
+                {
+                    "Main": true,
+                    "RouteTableAssociationId": "rtbassoc-02757e9c9b52c7e6c",
+                    "RouteTableId": "rtb-032eb3b03a09614a7",
+                    "AssociationState": {
+                        "State": "associated"
+                    }
+                }
+            ],
+            "PropagatingVgws": [],
+            "RouteTableId": "rtb-032eb3b03a09614a7",
+            "Routes": [
+                {
+                    "DestinationCidrBlock": "172.31.0.0/16",
+                    "GatewayId": "local",
+                    "Origin": "CreateRouteTable",
+                    "State": "active"
+                },
+                {
+                    "DestinationCidrBlock": "0.0.0.0/0",
+                    "GatewayId": "igw-00ab8e7d7ea1de783",
+                    "Origin": "CreateRoute",
+                    "State": "active"
+                }
+            ],
+            "Tags": [],
+            "VpcId": "vpc-0d76268d482855884",
+            "OwnerId": "084375569056"
+        }
+    ]
+}
+

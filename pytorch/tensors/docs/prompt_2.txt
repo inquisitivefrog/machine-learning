@@ -1,0 +1,276 @@
+
+(py3ml) tim@Tims-MBP tensors % cat tensor_autograd.py 
+#!/usr/bin/env python3
+# tensor_autograd.py: PyTorch example using autograd to fit a fourth-order polynomial to sin(x)
+# No GPU required; runs on CPU
+# ML workflow split into functions:
+# 1. Forward pass
+# 2. Loss computation
+# 3. Backward pass
+# 4. Weight updates
+# https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
+# https://pytorch.org/docs/stable/torch.html
+
+import datetime
+import math
+import psutil
+import torch
+import matplotlib.pyplot as plt
+
+def forward_pass(x, a, b, c, d, e, f):
+    """Compute predicted y using a fourth-order polynomial."""
+    return a + b * x + c * x ** 2 + d * x ** 3 + e * x ** 4 + f * x ** 5
+
+def compute_loss(y_pred, y):
+    """Compute mean squared error loss."""
+    return (y_pred - y).pow(2).sum()
+
+def backward_pass(loss, parameters, max_norm=1.0):
+    """Compute gradients with autograd and clip them."""
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(parameters, max_norm=max_norm)
+
+def update_weights(parameters, learning_rate):
+    """Update weights using gradient descent."""
+    #optimizer.step()
+    with torch.no_grad():
+        for param in parameters:
+            param -= learning_rate * param.grad
+            param.grad = None  # Zero gradient
+
+def visualize(x, y, y_pred, xLabel, yLabel):
+    # Plot the results
+    plt.plot(x.numpy(), y.numpy(), label=xLabel, color='blue')
+    plt.plot(x.numpy(), y_pred.detach().numpy(), label=yLabel, color='red', linestyle='--')
+    plt.legend()
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title(f'{xLabel} to {yLabel}')
+    plt.show()
+
+def ran(graph):
+    # Set data type and device (CPU since no GPU is available)
+    dtype = torch.float
+    device = torch.device("cpu")
+    print(f"Using {device} device")
+
+    # Create input tensor x (from -π to π, 2000 points) and output tensor y = sin(x)
+    x = torch.linspace(-math.pi, math.pi, 2000, dtype=dtype, device=device)
+    # Normalize x to [-1, 1] to reduce magnitude of higher-order terms
+    x_normalized = x / math.pi
+    if graph == 'cos':
+        # Taylor Series: 1 - x^2/2 + x^4/24
+        y = torch.cos(x)
+    elif graph == 'sin':
+        # Taylor Series: x - x^3/6 + x^5/120
+        y = torch.sin(x)
+
+    # Initialize random weights for a fourth-order polynomial: y = a + b*x + c*x^2 + d*x^3 + e*x^4
+    # requires_grad=True enables autograd to track operations for gradient computation
+    a = torch.randn((), dtype=dtype, device=device, requires_grad=True)
+    b = torch.randn((), dtype=dtype, device=device, requires_grad=True)
+    c = torch.randn((), dtype=dtype, device=device, requires_grad=True)
+    d = torch.randn((), dtype=dtype, device=device, requires_grad=True)
+    e = torch.randn((), dtype=dtype, device=device, requires_grad=True)
+    f = torch.randn((), dtype=dtype, device=device, requires_grad=True)
+    parameters = [a, b, c, d, e, f]
+
+    learning_rate = 1e-6  # Adjusted for faster convergence with normalization
+    for t in range(2000):
+        # ML workflow
+        # 1. Forward pass
+        y_pred = forward_pass(x_normalized, a, b, c, d, e, f)
+
+        # 2. Loss computation
+        loss = compute_loss(y_pred, y)
+        if t % 100 == 99:
+            print(f"Iteration {t}, Loss: {loss.item()}")
+
+        # 3. Backward pass
+        backward_pass(loss, parameters, max_norm=1.0)
+
+        # 4. Weight updates
+        #optimizer = torch.optim.SGD(parameters, lr=1e-4, momentum=0.5)
+        update_weights(parameters, learning_rate)
+
+    # 5. Visualize
+    if graph == 'sin':
+        visualize(x, y, y_pred, xLabel='sin(x)', yLabel='Polynomial Fit')
+    elif graph == 'sin':
+        visualize(x, y, y_pred, xLabel='cos(x)', yLabel='Polynomial Fit')
+
+    s1 = f'Result: y = {a.item():.2f} + {b.item():.2f}x + {c.item():.2f}x^2 '
+    s2 = f'+ {d.item():.2f}x^3 + {e.item():.2f}x^4 + {f.item():.2f}x^5'
+    print(s1 + s2)
+
+if __name__ == '__main__':
+    start_time = datetime.datetime.now()
+    ran(graph='cos')
+    end_time = datetime.datetime.now()
+    print(f'Execution time: {end_time - start_time}')
+    print(f'Memory usage: {psutil.virtual_memory().percent}%')
+    print(f'CPU usage: {psutil.cpu_percent()}%')
+(py3ml) tim@Tims-MBP tensors % 
+
+(py3ml) tim@Tims-MBP tensors % ./tensor_autograd.py  
+Using cpu device
+Iteration 99, Loss: 19028.20703125
+Iteration 199, Loss: 19027.17578125
+Iteration 299, Loss: 19026.1484375
+Iteration 399, Loss: 19025.12109375
+Iteration 499, Loss: 19024.08984375
+Iteration 599, Loss: 19023.0625
+Iteration 699, Loss: 19022.033203125
+Iteration 799, Loss: 19021.00390625
+Iteration 899, Loss: 19019.9765625
+Iteration 999, Loss: 19018.9453125
+Iteration 1099, Loss: 19017.91796875
+Iteration 1199, Loss: 19016.88671875
+Iteration 1299, Loss: 19015.859375
+Iteration 1399, Loss: 19014.830078125
+Iteration 1499, Loss: 19013.80078125
+Iteration 1599, Loss: 19012.7734375
+Iteration 1699, Loss: 19011.7421875
+Iteration 1799, Loss: 19010.71484375
+Iteration 1899, Loss: 19009.689453125
+Iteration 1999, Loss: 19008.66015625
+Result: y = -2.98 + 1.72x + 0.60x^2 + 2.14x^3 + 3.01x^4 + -1.15x^5
+Execution time: 0:00:00.834700
+Memory usage: 49.0%
+CPU usage: 15.2%
+
+(py3ml) tim@Tims-MBP tensors % cat tensor_nn.py 
+#!/usr/bin/env python3
+# tensor_nn.py: PyTorch example using torch.nn to fit a neural network to cos(x)
+# No GPU required; runs on CPU
+# ML workflow split into functions:
+# 1. Forward pass (via nn.Module)
+# 2. Loss computation
+# 3. Backward pass
+# 4. Weight updates
+# Adapted from https://pytorch.org/tutorials/beginner/pytorch_with_examples.html
+
+import datetime
+import math
+import psutil
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import matplotlib.pyplot as plt
+
+class Net(nn.Module):
+    """Neural network to approximate cos(x)."""
+    def __init__(self):
+        super(Net, self).__init__()
+        self.fc1 = nn.Linear(1, 64)  # Input: 1, Hidden: 64
+        self.fc2 = nn.Linear(64, 64) # Hidden: 64
+        self.fc3 = nn.Linear(64, 1)  # Output: 1
+    
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)  # No activation for regression
+        return x
+
+def compute_loss(y_pred, y, criterion):
+    """Compute mean squared error loss using nn.MSELoss."""
+    return criterion(y_pred, y)
+
+def backward_pass(loss):
+    """Compute gradients with autograd."""
+    loss.backward()
+
+def update_weights(optimizer):
+    """Update weights using optimizer."""
+    optimizer.step()
+    optimizer.zero_grad()
+
+def visualize(x, y, y_pred, xLabel, yLabel):
+    """Plot true and predicted functions."""
+    plt.plot(x.numpy(), y.numpy(), label=xLabel, color='blue')
+    plt.plot(x.numpy(), y_pred.detach().numpy(), label=yLabel, color='red', linestyle='--')
+    plt.legend()
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title(f'{xLabel} to {yLabel}')
+    plt.show()
+
+def ran(graph):
+    # Set data type and device
+    dtype = torch.float
+    device = torch.device("cpu")
+    print(f"Using {device} device")
+
+    # Create input tensor x (from -π to π, 2000 points) and output tensor y
+    x = torch.linspace(-math.pi, math.pi, 2000, dtype=dtype, device=device)
+    x = x.reshape(-1, 1)  # Shape: [2000, 1] for nn.Linear
+    if graph == 'cos':
+        y = torch.cos(x)
+    elif graph == 'sin':
+        y = torch.sin(x)
+
+    # Initialize model, loss function, and optimizer
+    model = Net().to(device)
+    criterion = nn.MSELoss(reduction='sum')  # Match original sum of squared errors
+    optimizer = optim.Adam(model.parameters(), lr=1e-3)  # Adam for faster convergence
+
+    # Training loop
+    num_epochs = 2000
+    for t in range(num_epochs):
+        # 1. Forward pass
+        y_pred = model(x)
+
+        # 2. Loss computation
+        loss = compute_loss(y_pred, y, criterion)
+        if t % 100 == 99:
+            print(f"Iteration {t}, Loss: {loss.item()}")
+
+        # 3. Backward pass
+        backward_pass(loss)
+
+        # 4. Weight updates
+        update_weights(optimizer)
+
+    # 5. Visualize
+    model.eval()
+    with torch.no_grad():
+        y_pred = model(x)
+    if graph == 'cos':
+        visualize(x.squeeze(), y, y_pred, xLabel='cos(x)', yLabel='Neural Network Fit')
+    elif graph == 'sin':
+        visualize(x.squeeze(), y, y_pred, xLabel='sin(x)', yLabel='Neural Network Fit')
+
+if __name__ == '__main__':
+    start_time = datetime.datetime.now()
+    ran(graph='cos')
+    end_time = datetime.datetime.now()
+    print(f'Execution time: {end_time - start_time}')
+    print(f'Memory usage: {psutil.virtual_memory().percent}%')
+    print(f'CPU usage: {psutil.cpu_percent()}%')
+(py3ml) tim@Tims-MBP tensors % ./tensor_nn.py  
+Using cpu device
+Iteration 99, Loss: 4.076214790344238
+Iteration 199, Loss: 1.6803059577941895
+Iteration 299, Loss: 0.9133801460266113
+Iteration 399, Loss: 0.537869930267334
+Iteration 499, Loss: 0.33562934398651123
+Iteration 599, Loss: 0.22275209426879883
+Iteration 699, Loss: 0.1538252979516983
+Iteration 799, Loss: 0.10883643478155136
+Iteration 899, Loss: 0.07401276379823685
+Iteration 999, Loss: 0.051388271152973175
+Iteration 1099, Loss: 0.039357397705316544
+Iteration 1199, Loss: 0.03181453049182892
+Iteration 1299, Loss: 0.02655942179262638
+Iteration 1399, Loss: 0.02272583357989788
+Iteration 1499, Loss: 0.019847722724080086
+Iteration 1599, Loss: 0.01764344982802868
+Iteration 1699, Loss: 0.015941403806209564
+Iteration 1799, Loss: 0.014615480788052082
+Iteration 1899, Loss: 0.0135669419541955
+Iteration 1999, Loss: 0.01273563876748085
+Execution time: 0:00:04.891459
+Memory usage: 57.5%
+CPU usage: 28.6%
+(py3ml) tim@Tims-MBP tensors % 
+

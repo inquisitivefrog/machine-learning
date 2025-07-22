@@ -1,0 +1,691 @@
+SAGEMAKER()                                                        SAGEMAKER()
+
+NNAAMMEE
+       sagemaker -
+
+DDEESSCCRRIIPPTTIIOONN
+       Provides APIs for creating and managing SageMaker resources.
+
+       Other Resources:
+
+       +o _S_a_g_e_M_a_k_e_r _D_e_v_e_l_o_p_e_r _G_u_i_d_e
+
+       +o _A_m_a_z_o_n _A_u_g_m_e_n_t_e_d _A_I _R_u_n_t_i_m_e _A_P_I _R_e_f_e_r_e_n_c_e
+
+AAVVAAIILLAABBLLEE CCOOMMMMAANNDDSS
+
+       +o add-association
+
+       +o add-tags
+
+       +o associate-trial-component
+
+       +o batch-describe-model-package
+
+       +o create-action
+
+       +o create-algorithm
+
+       +o create-app
+
+       +o create-app-image-config
+
+       +o create-artifact
+
+       +o create-auto-ml-job
+
+       +o create-auto-ml-job-v2
+
+       +o create-cluster
+
+       +o create-code-repository
+
+       +o create-compilation-job
+
+       +o create-context
+
+       +o create-data-quality-job-definition
+
+       +o create-device-fleet
+
+       +o create-domain
+
+       +o create-edge-deployment-plan
+
+       +o create-edge-deployment-stage
+
+       +o create-edge-packaging-job
+
+       +o create-endpoint
+
+       +o create-endpoint-config
+
+       +o create-experiment
+
+       +o create-feature-group
+
+       +o create-flow-definition
+
+       +o create-hub
+
+       +o create-hub-content-reference
+
+       +o create-human-task-ui
+
+       +o create-hyper-parameter-tuning-job
+
+       +o create-image
+
+       +o create-image-version
+
+       +o create-inference-component
+
+       +o create-inference-experiment
+
+       +o create-inference-recommendations-job
+
+       +o create-labeling-job
+
+       +o create-mlflow-tracking-server
+
+       +o create-model
+
+       +o create-model-bias-job-definition
+
+       +o create-model-card
+
+       +o create-model-card-export-job
+
+       +o create-model-explainability-job-definition
+
+       +o create-model-package
+
+       +o create-model-package-group
+
+       +o create-model-quality-job-definition
+
+       +o create-monitoring-schedule
+
+       +o create-notebook-instance
+
+       +o create-notebook-instance-lifecycle-config
+
+       +o create-optimization-job
+
+       +o create-pipeline
+
+       +o create-presigned-domain-url
+
+       +o create-presigned-mlflow-tracking-server-url
+
+       +o create-presigned-notebook-instance-url
+
+       +o create-processing-job
+
+       +o create-project
+
+       +o create-space
+
+       +o create-studio-lifecycle-config
+
+       +o create-training-job
+
+       +o create-transform-job
+
+       +o create-trial
+
+       +o create-trial-component
+
+       +o create-user-profile
+
+       +o create-workforce
+
+       +o create-workteam
+
+       +o delete-action
+
+       +o delete-algorithm
+
+       +o delete-app
+
+       +o delete-app-image-config
+
+       +o delete-artifact
+
+       +o delete-association
+
+       +o delete-cluster
+
+       +o delete-code-repository
+
+       +o delete-compilation-job
+
+       +o delete-context
+
+       +o delete-data-quality-job-definition
+
+       +o delete-device-fleet
+
+       +o delete-domain
+
+       +o delete-edge-deployment-plan
+
+       +o delete-edge-deployment-stage
+
+       +o delete-endpoint
+
+       +o delete-endpoint-config
+
+       +o delete-experiment
+
+       +o delete-feature-group
+
+       +o delete-flow-definition
+
+       +o delete-hub
+
+       +o delete-hub-content
+
+       +o delete-hub-content-reference
+
+       +o delete-human-task-ui
+
+       +o delete-hyper-parameter-tuning-job
+
+       +o delete-image
+
+       +o delete-image-version
+
+       +o delete-inference-component
+
+       +o delete-inference-experiment
+
+       +o delete-mlflow-tracking-server
+
+       +o delete-model
+
+       +o delete-model-bias-job-definition
+
+       +o delete-model-card
+
+       +o delete-model-explainability-job-definition
+
+       +o delete-model-package
+
+       +o delete-model-package-group
+
+       +o delete-model-package-group-policy
+
+       +o delete-model-quality-job-definition
+
+       +o delete-monitoring-schedule
+
+       +o delete-notebook-instance
+
+       +o delete-notebook-instance-lifecycle-config
+
+       +o delete-optimization-job
+
+       +o delete-pipeline
+
+       +o delete-project
+
+       +o delete-space
+
+       +o delete-studio-lifecycle-config
+
+       +o delete-tags
+
+       +o delete-trial
+
+       +o delete-trial-component
+
+       +o delete-user-profile
+
+       +o delete-workforce
+
+       +o delete-workteam
+
+       +o deregister-devices
+
+       +o describe-action
+
+       +o describe-algorithm
+
+       +o describe-app
+
+       +o describe-app-image-config
+
+       +o describe-artifact
+
+       +o describe-auto-ml-job
+
+       +o describe-auto-ml-job-v2
+
+       +o describe-cluster
+
+       +o describe-cluster-node
+
+       +o describe-code-repository
+
+       +o describe-compilation-job
+
+       +o describe-context
+
+       +o describe-data-quality-job-definition
+
+       +o describe-device
+
+       +o describe-device-fleet
+
+       +o describe-domain
+
+       +o describe-edge-deployment-plan
+
+       +o describe-edge-packaging-job
+
+       +o describe-endpoint
+
+       +o describe-endpoint-config
+
+       +o describe-experiment
+
+       +o describe-feature-group
+
+       +o describe-feature-metadata
+
+       +o describe-flow-definition
+
+       +o describe-hub
+
+       +o describe-hub-content
+
+       +o describe-human-task-ui
+
+       +o describe-hyper-parameter-tuning-job
+
+       +o describe-image
+
+       +o describe-image-version
+
+       +o describe-inference-component
+
+       +o describe-inference-experiment
+
+       +o describe-inference-recommendations-job
+
+       +o describe-labeling-job
+
+       +o describe-lineage-group
+
+       +o describe-mlflow-tracking-server
+
+       +o describe-model
+
+       +o describe-model-bias-job-definition
+
+       +o describe-model-card
+
+       +o describe-model-card-export-job
+
+       +o describe-model-explainability-job-definition
+
+       +o describe-model-package
+
+       +o describe-model-package-group
+
+       +o describe-model-quality-job-definition
+
+       +o describe-monitoring-schedule
+
+       +o describe-notebook-instance
+
+       +o describe-notebook-instance-lifecycle-config
+
+       +o describe-optimization-job
+
+       +o describe-pipeline
+
+       +o describe-pipeline-definition-for-execution
+
+       +o describe-pipeline-execution
+
+       +o describe-processing-job
+
+       +o describe-project
+
+       +o describe-space
+
+       +o describe-studio-lifecycle-config
+
+       +o describe-subscribed-workteam
+
+       +o describe-training-job
+
+       +o describe-transform-job
+
+       +o describe-trial
+
+       +o describe-trial-component
+
+       +o describe-user-profile
+
+       +o describe-workforce
+
+       +o describe-workteam
+
+       +o disable-sagemaker-servicecatalog-portfolio
+
+       +o disassociate-trial-component
+
+       +o enable-sagemaker-servicecatalog-portfolio
+
+       +o get-device-fleet-report
+
+       +o get-lineage-group-policy
+
+       +o get-model-package-group-policy
+
+       +o get-sagemaker-servicecatalog-portfolio-status
+
+       +o get-scaling-configuration-recommendation
+
+       +o get-search-suggestions
+
+       +o help
+
+       +o import-hub-content
+
+       +o list-actions
+
+       +o list-algorithms
+
+       +o list-aliases
+
+       +o list-app-image-configs
+
+       +o list-apps
+
+       +o list-artifacts
+
+       +o list-associations
+
+       +o list-auto-ml-jobs
+
+       +o list-candidates-for-auto-ml-job
+
+       +o list-cluster-nodes
+
+       +o list-clusters
+
+       +o list-code-repositories
+
+       +o list-compilation-jobs
+
+       +o list-contexts
+
+       +o list-data-quality-job-definitions
+
+       +o list-device-fleets
+
+       +o list-devices
+
+       +o list-domains
+
+       +o list-edge-deployment-plans
+
+       +o list-edge-packaging-jobs
+
+       +o list-endpoint-configs
+
+       +o list-endpoints
+
+       +o list-experiments
+
+       +o list-feature-groups
+
+       +o list-flow-definitions
+
+       +o list-hub-content-versions
+
+       +o list-hub-contents
+
+       +o list-hubs
+
+       +o list-human-task-uis
+
+       +o list-hyper-parameter-tuning-jobs
+
+       +o list-image-versions
+
+       +o list-images
+
+       +o list-inference-components
+
+       +o list-inference-experiments
+
+       +o list-inference-recommendations-job-steps
+
+       +o list-inference-recommendations-jobs
+
+       +o list-labeling-jobs
+
+       +o list-labeling-jobs-for-workteam
+
+       +o list-lineage-groups
+
+       +o list-mlflow-tracking-servers
+
+       +o list-model-bias-job-definitions
+
+       +o list-model-card-export-jobs
+
+       +o list-model-card-versions
+
+       +o list-model-cards
+
+       +o list-model-explainability-job-definitions
+
+       +o list-model-metadata
+
+       +o list-model-package-groups
+
+       +o list-model-packages
+
+       +o list-model-quality-job-definitions
+
+       +o list-models
+
+       +o list-monitoring-alert-history
+
+       +o list-monitoring-alerts
+
+       +o list-monitoring-executions
+
+       +o list-monitoring-schedules
+
+       +o list-notebook-instance-lifecycle-configs
+
+       +o list-notebook-instances
+
+       +o list-optimization-jobs
+
+       +o list-pipeline-execution-steps
+
+       +o list-pipeline-executions
+
+       +o list-pipeline-parameters-for-execution
+
+       +o list-pipelines
+
+       +o list-processing-jobs
+
+       +o list-projects
+
+       +o list-resource-catalogs
+
+       +o list-spaces
+
+       +o list-stage-devices
+
+       +o list-studio-lifecycle-configs
+
+       +o list-subscribed-workteams
+
+       +o list-tags
+
+       +o list-training-jobs
+
+       +o list-training-jobs-for-hyper-parameter-tuning-job
+
+       +o list-transform-jobs
+
+       +o list-trial-components
+
+       +o list-trials
+
+       +o list-user-profiles
+
+       +o list-workforces
+
+       +o list-workteams
+
+       +o put-model-package-group-policy
+
+       +o query-lineage
+
+       +o register-devices
+
+       +o render-ui-template
+
+       +o retry-pipeline-execution
+
+       +o search
+
+       +o send-pipeline-execution-step-failure
+
+       +o send-pipeline-execution-step-success
+
+       +o start-edge-deployment-stage
+
+       +o start-inference-experiment
+
+       +o start-mlflow-tracking-server
+
+       +o start-monitoring-schedule
+
+       +o start-notebook-instance
+
+       +o start-pipeline-execution
+
+       +o stop-auto-ml-job
+
+       +o stop-compilation-job
+
+       +o stop-edge-deployment-stage
+
+       +o stop-edge-packaging-job
+
+       +o stop-hyper-parameter-tuning-job
+
+       +o stop-inference-experiment
+
+       +o stop-inference-recommendations-job
+
+       +o stop-labeling-job
+
+       +o stop-mlflow-tracking-server
+
+       +o stop-monitoring-schedule
+
+       +o stop-notebook-instance
+
+       +o stop-optimization-job
+
+       +o stop-pipeline-execution
+
+       +o stop-processing-job
+
+       +o stop-training-job
+
+       +o stop-transform-job
+
+       +o update-action
+
+       +o update-app-image-config
+
+       +o update-artifact
+
+       +o update-cluster
+
+       +o update-cluster-software
+
+       +o update-code-repository
+
+       +o update-context
+
+       +o update-device-fleet
+
+       +o update-devices
+
+       +o update-domain
+
+       +o update-endpoint
+
+       +o update-endpoint-weights-and-capacities
+
+       +o update-experiment
+
+       +o update-feature-group
+
+       +o update-feature-metadata
+
+       +o update-hub
+
+       +o update-image
+
+       +o update-image-version
+
+       +o update-inference-component
+
+       +o update-inference-component-runtime-config
+
+       +o update-inference-experiment
+
+       +o update-mlflow-tracking-server
+
+       +o update-model-card
+
+       +o update-model-package
+
+       +o update-monitoring-alert
+
+       +o update-monitoring-schedule
+
+       +o update-notebook-instance
+
+       +o update-notebook-instance-lifecycle-config
+
+       +o update-pipeline
+
+       +o update-pipeline-execution
+
+       +o update-project
+
+       +o update-space
+
+       +o update-training-job
+
+       +o update-trial
+
+       +o update-trial-component
+
+       +o update-user-profile
+
+       +o update-workforce
+
+       +o update-workteam
+
+       +o wait
+
+                                                                   SAGEMAKER()

@@ -1,7 +1,5 @@
 #!/bin/bash
 
- ejecutables
-
 # Delete AWS resources after checking existence
 # Usage: ./delete_resources.sh [region]
 # Default region: us-east-1

@@ -1,0 +1,21 @@
+2025-05-02 15:56:25,932 - INFO - Attempting to load model and scaler
+2025-05-02 15:56:26,977 - INFO - Random Forest model and scaler loaded successfully
+2025-05-02 15:56:26,978 - INFO - Starting Flask server
+2025-05-02 15:56:27,020 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.1.108:5000
+2025-05-02 15:56:27,021 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-02 15:56:27,021 - INFO -  * Restarting with stat
+2025-05-02 15:56:27,317 - INFO - Attempting to load model and scaler
+2025-05-02 15:56:28,247 - INFO - Random Forest model and scaler loaded successfully
+2025-05-02 15:56:28,248 - INFO - Starting Flask server
+2025-05-02 15:56:28,272 - WARNING -  * Debugger is active!
+2025-05-02 15:56:28,282 - INFO -  * Debugger PIN: 108-247-922
+2025-05-02 15:56:35,613 - INFO - Health check requested
+2025-05-02 15:56:35,613 - INFO - 127.0.0.1 - - [02/May/2025 15:56:35] "GET /health HTTP/1.1" 200 -
+2025-05-02 15:56:35,630 - INFO - Prediction request received
+2025-05-02 15:56:35,630 - INFO - Applying scaler to features
+2025-05-02 15:56:35,631 - INFO - Making prediction
+2025-05-02 15:56:35,640 - INFO - Predicted digit: 0, Probabilities: [0.9762857142857143, 0.005142857142857143, 0.0, 0.0, 0.0022857142857142855, 0.003952380952380952, 0.004523809523809524, 0.0011428571428571427, 0.003238095238095238, 0.0034285714285714284]
+2025-05-02 15:56:35,641 - INFO - 127.0.0.1 - - [02/May/2025 15:56:35] "POST /predict HTTP/1.1" 200 -

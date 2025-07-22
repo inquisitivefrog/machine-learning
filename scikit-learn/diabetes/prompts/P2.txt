@@ -1,0 +1,897 @@
+
+tim@Tims-MBP ~ % cd Documents/workspace/python3/machine-learning/diabetes 
+tim@Tims-MBP diabetes % source ~/Desktop/Work/Python_Practice/py3ml/bin/activate
+
+(py3ml) tim@Tims-MBP diabetes % cat diabetes.py
+#!/usr/bin/env python3
+
+import gc
+import glob
+import logging
+import time
+from datetime import datetime
+import joblib
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_diabetes
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor, StackingRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.svm import SVR
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from sklearn.model_selection import cross_val_score, train_test_split, GridSearchCV, RandomizedSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import PolynomialFeatures, StandardScaler
+from sklearn.feature_selection import RFE
+from sklearn.decomposition import PCA
+import xgboost as xgb
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("output/diabetes.log"),
+        logging.StreamHandler()
+    ]
+)
+
+def load_dataset():
+    try:
+        diabetes = load_diabetes()
+        X, y = diabetes.data, diabetes.target
+        logging.info("Dataset loaded successfully")
+        return X, y, diabetes
+    except Exception as e:
+        logging.error(f"Error loading dataset: {e}")
+        return None, None, None
+
+def transform_features(X, feature_names):
+    try:
+        X_transformed = X.copy()
+        feature_names_list = list(feature_names)
+        bmi_idx = feature_names_list.index('bmi')
+        bp_idx = feature_names_list.index('bp')
+        s5_idx = feature_names_list.index('s5')
+        X_transformed[:, bmi_idx] = np.log1p(X[:, bmi_idx] - X[:, bmi_idx].min() + 1)
+        X_transformed[:, s5_idx] = np.log1p(X[:, s5_idx] - X[:, s5_idx].min() + 1)
+        bmi_bp_ratio = X[:, bmi_idx] / (X[:, bp_idx] + 1e-6)
+        X_transformed = np.c_[X_transformed, bmi_bp_ratio]
+        new_feature_names = feature_names_list + ['bmi_bp_ratio']
+        assert X_transformed.shape[1] == len(new_feature_names), "Feature count mismatch"
+        return X_transformed, new_feature_names
+    except Exception as e:
+        logging.error(f"Error transforming features: {e}")
+        return None, None
+
+def create_polynomial_features(X, degree=3, diabetes=None):
+    try:
+        poly = PolynomialFeatures(degree=degree, include_bias=False)
+        X_poly = poly.fit_transform(X)
+        logging.info("Polynomial feature count: %d", X_poly.shape[1])
+        logging.info("Polynomial feature names: %s", poly.get_feature_names_out())
+        return X_poly, poly, diabetes
+    except Exception as e:
+        logging.error(f"Error creating polynomial features: %s", e)
+        return None, None, None
+
+def split_dataset(X, y, test_size=0.2, random_state=42):
+    try:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+        logging.info("Dataset split into %d training and %d test samples", len(X_train), len(X_test))
+        return X_train, X_test, y_train, y_test, scaler
+    except Exception as e:
+        logging.error(f"Error splitting dataset: %s", e)
+        return None, None, None, None, None
+
+def train_model(X_train, y_train, model_type="rf"):
+    try:
+        if model_type == "rf":
+            param_grid = {
+                'regressor__n_estimators': [50, 100],
+                'regressor__max_depth': [None, 10],
+                'regressor__min_samples_split': [2, 5]
+            }
+            model = RandomForestRegressor(random_state=42)
+        elif model_type == "gb":
+            param_grid = {
+                'regressor__n_estimators': [50, 100],
+                'regressor__learning_rate': [0.01, 0.05],
+                'regressor__max_depth': [2, 3]
+            }
+            model = GradientBoostingRegressor(random_state=42)
+        elif model_type == "dt":
+            param_grid = {
+                'regressor__max_depth': [None, 5, 10],
+                'regressor__min_samples_split': [2, 5]
+            }
+            model = DecisionTreeRegressor(random_state=42)
+        elif model_type == "knn":
+            param_grid = {
+                'regressor__n_neighbors': [3, 5, 7],
+                'regressor__weights': ['uniform', 'distance']
+            }
+            model = KNeighborsRegressor()
+        elif model_type == "svr":
+            param_grid = {
+                'regressor__C': [0.1, 1.0],
+                'regressor__epsilon': [0.1, 0.5]
+            }
+            model = SVR(kernel='linear')
+        else:
+            logging.error("Unsupported model type: %s", model_type)
+            return None
+        pipeline = Pipeline([('regressor', model)])
+        grid_search = GridSearchCV(pipeline, param_grid, cv=5, scoring='neg_mean_squared_error', n_jobs=1)
+        grid_search.fit(X_train, y_train)
+        logging.info("Best parameters for %s: %s", model_type, grid_search.best_params_)
+        return grid_search.best_estimator_
+    except Exception as e:
+        logging.error(f"Error training %s model: %s", model_type, e)
+        return None
+
+def train_xgb_model(X_train, y_train):
+    try:
+        param_dist = {
+            'regressor__n_estimators': [50, 100],
+            'regressor__learning_rate': [0.01, 0.05],
+            'regressor__max_depth': [2, 3]
+        }
+        model = xgb.XGBRegressor(random_state=42, objective='reg:squarederror')
+        pipeline = Pipeline([('regressor', model)])
+        random_search = RandomizedSearchCV(pipeline, param_dist, n_iter=10, cv=5, scoring='neg_mean_squared_error', n_jobs=1, random_state=42)
+        random_search.fit(X_train, y_train)
+        logging.info("Best parameters for xgb: %s", random_search.best_params_)
+        return random_search.best_estimator_
+    except Exception as e:
+        logging.error(f"Error training xgb model: %s", e)
+        return None
+
+def train_linear_model(X_train, y_train):
+    try:
+        model = LinearRegression()
+        pipeline = Pipeline([('regressor', model)])
+        pipeline.fit(X_train, y_train)
+        logging.info("Trained linear regression model")
+        return pipeline
+    except Exception as e:
+        logging.error(f"Error training linear model: %s", e)
+        return None
+
+def train_stacking_model(X_train, y_train):
+    try:
+        estimators = [
+            ('rf', RandomForestRegressor(n_estimators=50, random_state=42)),
+            ('gb', GradientBoostingRegressor(n_estimators=50, random_state=42)),
+            ('xgb', xgb.XGBRegressor(n_estimators=50, random_state=42))
+        ]
+        model = StackingRegressor(estimators=estimators, final_estimator=LinearRegression(), cv=5)
+        pipeline = Pipeline([('regressor', model)])
+        pipeline.fit(X_train, y_train)
+        logging.info("Trained stacking model")
+        return pipeline
+    except Exception as e:
+        logging.error(f"Error training stacking model: %s", e)
+        return None
+
+def select_features(X_train, y_train, X_test, model, n_features=10):
+    try:
+        selector = RFE(model.named_steps['regressor'], n_features_to_select=n_features)
+        selector.fit(X_train, y_train)
+        X_train_selected = selector.transform(X_train)
+        X_test_selected = selector.transform(X_test)
+        selected_features = selector.support_
+        logging.info("Selected %d features", n_features)
+        return X_train_selected, X_test_selected, selected_features
+    except Exception as e:
+        logging.error(f"Error selecting features: %s", e)
+        return None, None, None
+
+def reduce_dimensions(X_train, X_test, n_components=10):
+    try:
+        pca = PCA(n_components=n_components)
+        X_train_pca = pca.fit_transform(X_train)
+        X_test_pca = pca.transform(X_test)
+        logging.info("Reduced to %d components, explained variance ratio: %.2f", n_components, sum(pca.explained_variance_ratio_))
+        return X_train_pca, X_test_pca, pca
+    except Exception as e:
+        logging.error(f"Error reducing dimensions: %s", e)
+        return None, None, None
+
+def evaluate_model(model, X_test, y_test, diabetes, debug=False, model_type="rf", poly=None, feature_names=None):
+    try:
+        predictions = model.predict(X_test)
+        mse = mean_squared_error(y_test, predictions)
+        rmse = np.sqrt(mse)
+        mae = mean_absolute_error(y_test, predictions)
+        r2 = r2_score(y_test, predictions)
+        logging.info("Test Set Metrics (%s):", model_type)
+        logging.info("  Mean Squared Error: %.2f", mse)
+        logging.info("  Root Mean Squared Error: %.2f", rmse)
+        logging.info("  Mean Absolute Error: %.2f", mae)
+        logging.info("  R² Score: %.2f", r2)
+        if debug:
+            save_path = f"output/diabetes_{model_type}_scatter_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            plt.figure(figsize=(8, 6))
+            sns.scatterplot(x=y_test, y=predictions, alpha=0.5)
+            plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
+            plt.xlabel("Actual Progression")
+            plt.ylabel("Predicted Progression")
+            plt.title(f"{model_type.upper()} Actual vs Predicted Disease Progression")
+            plt.savefig(save_path, dpi=100, bbox_inches="tight")
+            logging.info("Scatter plot saved to %s", save_path)
+            plt.close('all')
+
+            residual_save_path = f"output/diabetes_{model_type}_residuals_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            plt.figure(figsize=(8, 6))
+            residuals = y_test - predictions
+            sns.scatterplot(x=predictions, y=residuals, alpha=0.5)
+            plt.axhline(0, color='r', linestyle='--')
+            plt.xlabel("Predicted Progression")
+            plt.ylabel("Residuals")
+            plt.title(f"{model_type.upper()} Residual Plot")
+            plt.savefig(residual_save_path, dpi=100, bbox_inches="tight")
+            logging.info("Residual plot saved to %s", residual_save_path)
+            plt.close('all')
+
+            if model_type in ["rf", "gb", "xgb", "dt"] and feature_names is not None:
+                importances = model.named_steps['regressor'].feature_importances_
+                importance_save_path = f"output/diabetes_{model_type}_importances_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                plt.figure(figsize=(10, 6))
+                top_indices = np.argsort(importances)[-10:]
+                top_importances = importances[top_indices]
+                top_names = [feature_names[i] for i in top_indices]
+                sns.barplot(x=top_importances, y=top_names)
+                plt.title(f"{model_type.upper()} Feature Importances")
+                plt.savefig(importance_save_path, dpi=100, bbox_inches="tight")
+                logging.info("Feature importance plot saved to %s", importance_save_path)
+                plt.close('all')
+    except Exception as e:
+        logging.error(f"Error evaluating %s model: %s", model_type, e)
+
+def measure_model(model, X_train, y_train, X_test, y_test, model_type="rf"):
+    try:
+        train_predictions = model.predict(X_train)
+        train_rmse = np.sqrt(mean_squared_error(y_train, train_predictions))
+        test_predictions = model.predict(X_test)
+        test_rmse = np.sqrt(mean_squared_error(y_test, test_predictions))
+        cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='neg_mean_squared_error')
+        cv_rmse = np.sqrt(-cv_scores.mean())
+        logging.info("Training Set RMSE (%s): %.2f", model_type, train_rmse)
+        logging.info("Test Set RMSE (%s): %.2f", model_type, test_rmse)
+        logging.info("Cross-validated RMSE (%s): %.2f", model_type, cv_rmse)
+    except Exception as e:
+        logging.error(f"Error measuring %s model: %s", model_type, e)
+
+def log_feature_importances(model, model_type, poly, feature_names):
+    try:
+        importances = model.named_steps['regressor'].feature_importances_
+        indices = np.argsort(importances)[::-1]
+        logging.info("Feature Importances (%s):", model_type)
+        for i in indices[:10]:
+            logging.info("  %s: %.4f", feature_names[i], importances[i])
+    except Exception as e:
+        logging.error(f"Error logging feature importances for %s: %s", model_type, e)
+
+def print_dataset_info(X, X_train, diabetes):
+    try:
+        logging.info("Dataset Information:")
+        logging.info("  Description: Diabetes dataset")
+        logging.info("  Sample Size: %d", X.shape[0])
+        logging.info("  Features: %d", X.shape[1])
+        logging.info("  Feature Names: %s", diabetes.feature_names)
+        if X_train is not None:
+            logging.info("  Training Size: %d", X_train.shape[0])
+    except Exception as e:
+        logging.error(f"Error printing dataset info: %s", e)
+
+def debug(X, y, diabetes, debug_mode=False, poly=None, feature_names=None):
+    try:
+        if feature_names is None:
+            feature_names = diabetes.feature_names if poly is None else poly.get_feature_names_out(diabetes.feature_names)
+        if X.shape[1] != len(feature_names):
+            logging.error("Shape mismatch: X has %d features, but %d feature names provided", X.shape[1], len(feature_names))
+            return
+        logging.debug("Features: %s", feature_names)
+        logging.debug("Target: Disease Progression")
+        logging.debug("Source: %s", diabetes.data_filename)
+        df = pd.DataFrame(X, columns=feature_names)
+        logging.debug("Sample:\n%s", df.iloc[10:12])
+        logging.debug("Summary Statistics:\n%s", df.describe())
+        logging.debug("Target Distribution:\n%s", pd.Series(y).describe())
+        if debug_mode:
+            save_path = f"output/diabetes_heatmap_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            plt.figure(figsize=(10, 8))
+            sns.heatmap(df.corr(), annot=(poly is None), cmap='coolwarm', fmt='.2f')
+            plt.title("Feature Correlation Heatmap")
+            plt.savefig(save_path, dpi=100, bbox_inches="tight")
+            logging.info("Correlation heatmap saved to %s", save_path)
+            plt.close('all')
+    except Exception as e:
+        logging.error(f"Error debugging dataset: %s", e)
+
+def save_model(model, poly, scaler, model_type="rf"):
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"output/diabetes_{model_type}_model_{timestamp}.pkl"
+        joblib.dump(model, filename)
+        joblib.dump(poly, f"output/poly_{timestamp}.pkl")
+        joblib.dump(scaler, f"output/scaler_{timestamp}.pkl")
+        # Update latest models
+        joblib.dump(model, f"output/diabetes_{model_type}_model_latest.pkl")
+        joblib.dump(poly, "output/poly.pkl")
+        joblib.dump(scaler, "output/scaler.pkl")
+        logging.info("Model saved to %s", filename)
+    except Exception as e:
+        logging.error(f"Error saving %s model: %s", model_type, e)
+
+def predict_new_patient(model_path, patient_data, poly, scaler, feature_names):
+    try:
+        model = joblib.load(model_path)
+        patient_transformed, _ = transform_features(patient_data, feature_names)
+        patient_poly = poly.transform(patient_transformed)
+        patient_scaled = scaler.transform(patient_poly)
+        prediction = model.predict(patient_scaled)
+        logging.info("Predicted progression: %.2f", prediction[0])
+        return prediction
+    except Exception as e:
+        logging.error("Error predicting: %s", e)
+        return None
+
+def main():
+    start_time = time.time()
+    logging.info("Starting diabetes prediction script at %s", datetime.now())
+    X, y, diabetes = load_dataset()
+    if X is None or y is None:
+        logging.error("Failed to load dataset")
+        return
+    X, y = X[:200], y[:200]
+    print_dataset_info(X, None, diabetes)
+    debug(X, y, diabetes, debug_mode=True)
+    X_transformed, new_feature_names = transform_features(X, diabetes.feature_names)
+    if X_transformed is None:
+        logging.error("Failed to transform features")
+        return
+    X_poly, poly, diabetes = create_polynomial_features(X_transformed, degree=3, diabetes=diabetes)
+    if X_poly is None:
+        logging.error("Failed to create polynomial features")
+        return
+    feature_names = poly.get_feature_names_out(new_feature_names)
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X_poly, y)
+    if X_train is None:
+        logging.error("Failed to split dataset")
+        return
+    # Train and evaluate models
+    for model_type in ["rf", "gb", "xgb", "stack", "lr", "rf_pca", "dt", "knn", "svr"]:
+        if model_type == "rf_pca":
+            X_train_pca, X_test_pca, pca = reduce_dimensions(X_train, X_test, n_components=10)
+            model = train_model(X_train_pca, y_train, model_type="rf")
+            if model is None:
+                logging.error("Failed to train rf_pca model")
+                continue
+            evaluate_model(model, X_test_pca, y_test, diabetes, debug=True, model_type="rf_pca")
+            measure_model(model, X_train_pca, y_train, X_test_pca, y_test, model_type="rf_pca")
+            save_model(model, poly, scaler, model_type="rf_pca")
+        else:
+            if model_type == "xgb":
+                model = train_xgb_model(X_train, y_train)
+            elif model_type == "stack":
+                model = train_stacking_model(X_train, y_train)
+            elif model_type == "lr":
+                model = train_linear_model(X_train, y_train)
+            else:  # rf, gb, dt, knn, svr
+                model = train_model(X_train, y_train, model_type=model_type)
+            if model is None:
+                logging.error("Failed to train %s model", model_type)
+                continue
+            evaluate_model(model, X_test, y_test, diabetes, debug=True, model_type=model_type, poly=poly, feature_names=feature_names)
+            measure_model(model, X_train, y_train, X_test, y_test, model_type=model_type)
+            save_model(model, poly, scaler, model_type=model_type)
+        gc.collect()
+    # Feature selection
+    for model_type in ["rf", "gb"]:
+        model = train_model(X_train, y_train, model_type=model_type)
+        if model is None:
+            logging.error("Failed to train %s model for feature selection", model_type)
+            continue
+        X_train_selected, X_test_selected, selected_features = select_features(X_train, y_train, X_test, model)
+        if X_train_selected is None:
+            logging.error("Failed to select features for %s", model_type)
+            continue
+        selected_names = [feature_names[i] for i, selected in enumerate(selected_features) if selected]
+        model_selected = train_model(X_train_selected, y_train, model_type=model_type)
+        if model_selected is None:
+            logging.error("Failed to train %s selected model", model_type)
+            continue
+        evaluate_model(model_selected, X_test_selected, y_test, diabetes, debug=True, model_type=f"{model_type}_selected", feature_names=selected_names)
+        measure_model(model_selected, X_train_selected, y_train, X_test_selected, y_test, model_type=f"{model_type}_selected")
+        save_model(model_selected, poly, scaler, model_type=f"{model_type}_selected")
+        log_feature_importances(model_selected, f"{model_type}_selected", None, selected_names)
+        gc.collect()
+    # Predict new patient
+    model_path = glob.glob("output/diabetes_gb_model_*.pkl")[-1]
+    patient_data = X[:1]
+    prediction = predict_new_patient(model_path, patient_data, poly, scaler, diabetes.feature_names)
+    if prediction is not None:
+        logging.info("Predicted progression for new patient: %.2f", prediction[0])
+    logging.info("Script completed in %.2f seconds", time.time() - start_time)
+
+if __name__ == "__main__":
+    main()
+
+(py3ml) tim@Tims-MBP diabetes % MPROF_OUTPUT=output/knn_main_memory_profile.log python -m memory_profiler diabetes.py
+2025-05-02 08:25:01,580 - INFO - Starting diabetes prediction script at 2025-05-02 08:25:01.580962
+2025-05-02 08:25:01,592 - INFO - Dataset loaded successfully
+2025-05-02 08:25:01,592 - INFO - Dataset Information:
+2025-05-02 08:25:01,592 - INFO -   Description: Diabetes dataset
+2025-05-02 08:25:01,592 - INFO -   Sample Size: 200
+2025-05-02 08:25:01,592 - INFO -   Features: 10
+2025-05-02 08:25:01,592 - INFO -   Feature Names: ['age', 'sex', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']
+2025-05-02 08:25:02,060 - INFO - Correlation heatmap saved to output/diabetes_heatmap_20250502_082501.png
+2025-05-02 08:25:02,061 - INFO - Polynomial feature count: 363
+2025-05-02 08:25:02,063 - INFO - Polynomial feature names: ['x0' 'x1' 'x2' 'x3' 'x4' 'x5' 'x6' 'x7' 'x8' 'x9' 'x10' 'x0^2' 'x0 x1'
+ 'x0 x2' 'x0 x3' 'x0 x4' 'x0 x5' 'x0 x6' 'x0 x7' 'x0 x8' 'x0 x9' 'x0 x10'
+ 'x1^2' 'x1 x2' 'x1 x3' 'x1 x4' 'x1 x5' 'x1 x6' 'x1 x7' 'x1 x8' 'x1 x9'
+ 'x1 x10' 'x2^2' 'x2 x3' 'x2 x4' 'x2 x5' 'x2 x6' 'x2 x7' 'x2 x8' 'x2 x9'
+ 'x2 x10' 'x3^2' 'x3 x4' 'x3 x5' 'x3 x6' 'x3 x7' 'x3 x8' 'x3 x9' 'x3 x10'
+ 'x4^2' 'x4 x5' 'x4 x6' 'x4 x7' 'x4 x8' 'x4 x9' 'x4 x10' 'x5^2' 'x5 x6'
+ 'x5 x7' 'x5 x8' 'x5 x9' 'x5 x10' 'x6^2' 'x6 x7' 'x6 x8' 'x6 x9' 'x6 x10'
+ 'x7^2' 'x7 x8' 'x7 x9' 'x7 x10' 'x8^2' 'x8 x9' 'x8 x10' 'x9^2' 'x9 x10'
+ 'x10^2' 'x0^3' 'x0^2 x1' 'x0^2 x2' 'x0^2 x3' 'x0^2 x4' 'x0^2 x5'
+ 'x0^2 x6' 'x0^2 x7' 'x0^2 x8' 'x0^2 x9' 'x0^2 x10' 'x0 x1^2' 'x0 x1 x2'
+ 'x0 x1 x3' 'x0 x1 x4' 'x0 x1 x5' 'x0 x1 x6' 'x0 x1 x7' 'x0 x1 x8'
+ 'x0 x1 x9' 'x0 x1 x10' 'x0 x2^2' 'x0 x2 x3' 'x0 x2 x4' 'x0 x2 x5'
+ 'x0 x2 x6' 'x0 x2 x7' 'x0 x2 x8' 'x0 x2 x9' 'x0 x2 x10' 'x0 x3^2'
+ 'x0 x3 x4' 'x0 x3 x5' 'x0 x3 x6' 'x0 x3 x7' 'x0 x3 x8' 'x0 x3 x9'
+ 'x0 x3 x10' 'x0 x4^2' 'x0 x4 x5' 'x0 x4 x6' 'x0 x4 x7' 'x0 x4 x8'
+ 'x0 x4 x9' 'x0 x4 x10' 'x0 x5^2' 'x0 x5 x6' 'x0 x5 x7' 'x0 x5 x8'
+ 'x0 x5 x9' 'x0 x5 x10' 'x0 x6^2' 'x0 x6 x7' 'x0 x6 x8' 'x0 x6 x9'
+ 'x0 x6 x10' 'x0 x7^2' 'x0 x7 x8' 'x0 x7 x9' 'x0 x7 x10' 'x0 x8^2'
+ 'x0 x8 x9' 'x0 x8 x10' 'x0 x9^2' 'x0 x9 x10' 'x0 x10^2' 'x1^3' 'x1^2 x2'
+ 'x1^2 x3' 'x1^2 x4' 'x1^2 x5' 'x1^2 x6' 'x1^2 x7' 'x1^2 x8' 'x1^2 x9'
+ 'x1^2 x10' 'x1 x2^2' 'x1 x2 x3' 'x1 x2 x4' 'x1 x2 x5' 'x1 x2 x6'
+ 'x1 x2 x7' 'x1 x2 x8' 'x1 x2 x9' 'x1 x2 x10' 'x1 x3^2' 'x1 x3 x4'
+ 'x1 x3 x5' 'x1 x3 x6' 'x1 x3 x7' 'x1 x3 x8' 'x1 x3 x9' 'x1 x3 x10'
+ 'x1 x4^2' 'x1 x4 x5' 'x1 x4 x6' 'x1 x4 x7' 'x1 x4 x8' 'x1 x4 x9'
+ 'x1 x4 x10' 'x1 x5^2' 'x1 x5 x6' 'x1 x5 x7' 'x1 x5 x8' 'x1 x5 x9'
+ 'x1 x5 x10' 'x1 x6^2' 'x1 x6 x7' 'x1 x6 x8' 'x1 x6 x9' 'x1 x6 x10'
+ 'x1 x7^2' 'x1 x7 x8' 'x1 x7 x9' 'x1 x7 x10' 'x1 x8^2' 'x1 x8 x9'
+ 'x1 x8 x10' 'x1 x9^2' 'x1 x9 x10' 'x1 x10^2' 'x2^3' 'x2^2 x3' 'x2^2 x4'
+ 'x2^2 x5' 'x2^2 x6' 'x2^2 x7' 'x2^2 x8' 'x2^2 x9' 'x2^2 x10' 'x2 x3^2'
+ 'x2 x3 x4' 'x2 x3 x5' 'x2 x3 x6' 'x2 x3 x7' 'x2 x3 x8' 'x2 x3 x9'
+ 'x2 x3 x10' 'x2 x4^2' 'x2 x4 x5' 'x2 x4 x6' 'x2 x4 x7' 'x2 x4 x8'
+ 'x2 x4 x9' 'x2 x4 x10' 'x2 x5^2' 'x2 x5 x6' 'x2 x5 x7' 'x2 x5 x8'
+ 'x2 x5 x9' 'x2 x5 x10' 'x2 x6^2' 'x2 x6 x7' 'x2 x6 x8' 'x2 x6 x9'
+ 'x2 x6 x10' 'x2 x7^2' 'x2 x7 x8' 'x2 x7 x9' 'x2 x7 x10' 'x2 x8^2'
+ 'x2 x8 x9' 'x2 x8 x10' 'x2 x9^2' 'x2 x9 x10' 'x2 x10^2' 'x3^3' 'x3^2 x4'
+ 'x3^2 x5' 'x3^2 x6' 'x3^2 x7' 'x3^2 x8' 'x3^2 x9' 'x3^2 x10' 'x3 x4^2'
+ 'x3 x4 x5' 'x3 x4 x6' 'x3 x4 x7' 'x3 x4 x8' 'x3 x4 x9' 'x3 x4 x10'
+ 'x3 x5^2' 'x3 x5 x6' 'x3 x5 x7' 'x3 x5 x8' 'x3 x5 x9' 'x3 x5 x10'
+ 'x3 x6^2' 'x3 x6 x7' 'x3 x6 x8' 'x3 x6 x9' 'x3 x6 x10' 'x3 x7^2'
+ 'x3 x7 x8' 'x3 x7 x9' 'x3 x7 x10' 'x3 x8^2' 'x3 x8 x9' 'x3 x8 x10'
+ 'x3 x9^2' 'x3 x9 x10' 'x3 x10^2' 'x4^3' 'x4^2 x5' 'x4^2 x6' 'x4^2 x7'
+ 'x4^2 x8' 'x4^2 x9' 'x4^2 x10' 'x4 x5^2' 'x4 x5 x6' 'x4 x5 x7' 'x4 x5 x8'
+ 'x4 x5 x9' 'x4 x5 x10' 'x4 x6^2' 'x4 x6 x7' 'x4 x6 x8' 'x4 x6 x9'
+ 'x4 x6 x10' 'x4 x7^2' 'x4 x7 x8' 'x4 x7 x9' 'x4 x7 x10' 'x4 x8^2'
+ 'x4 x8 x9' 'x4 x8 x10' 'x4 x9^2' 'x4 x9 x10' 'x4 x10^2' 'x5^3' 'x5^2 x6'
+ 'x5^2 x7' 'x5^2 x8' 'x5^2 x9' 'x5^2 x10' 'x5 x6^2' 'x5 x6 x7' 'x5 x6 x8'
+ 'x5 x6 x9' 'x5 x6 x10' 'x5 x7^2' 'x5 x7 x8' 'x5 x7 x9' 'x5 x7 x10'
+ 'x5 x8^2' 'x5 x8 x9' 'x5 x8 x10' 'x5 x9^2' 'x5 x9 x10' 'x5 x10^2' 'x6^3'
+ 'x6^2 x7' 'x6^2 x8' 'x6^2 x9' 'x6^2 x10' 'x6 x7^2' 'x6 x7 x8' 'x6 x7 x9'
+ 'x6 x7 x10' 'x6 x8^2' 'x6 x8 x9' 'x6 x8 x10' 'x6 x9^2' 'x6 x9 x10'
+ 'x6 x10^2' 'x7^3' 'x7^2 x8' 'x7^2 x9' 'x7^2 x10' 'x7 x8^2' 'x7 x8 x9'
+ 'x7 x8 x10' 'x7 x9^2' 'x7 x9 x10' 'x7 x10^2' 'x8^3' 'x8^2 x9' 'x8^2 x10'
+ 'x8 x9^2' 'x8 x9 x10' 'x8 x10^2' 'x9^3' 'x9^2 x10' 'x9 x10^2' 'x10^3']
+2025-05-02 08:25:02,069 - INFO - Dataset split into 160 training and 40 test samples
+2025-05-02 08:25:56,376 - INFO - Best parameters for rf: {'regressor__max_depth': 10, 'regressor__min_samples_split': 5, 'regressor__n_estimators': 100}
+2025-05-02 08:25:56,385 - INFO - Test Set Metrics (rf):
+2025-05-02 08:25:56,385 - INFO -   Mean Squared Error: 3400.84
+2025-05-02 08:25:56,385 - INFO -   Root Mean Squared Error: 58.32
+2025-05-02 08:25:56,385 - INFO -   Mean Absolute Error: 46.75
+2025-05-02 08:25:56,385 - INFO -   R² Score: 0.39
+2025-05-02 08:25:56,567 - INFO - Scatter plot saved to output/diabetes_rf_scatter_20250502_082556.png
+2025-05-02 08:25:56,736 - INFO - Residual plot saved to output/diabetes_rf_residuals_20250502_082556.png
+2025-05-02 08:25:56,932 - INFO - Feature importance plot saved to output/diabetes_rf_importances_20250502_082556.png
+2025-05-02 08:26:04,902 - INFO - Training Set RMSE (rf): 23.17
+2025-05-02 08:26:04,902 - INFO - Test Set RMSE (rf): 58.32
+2025-05-02 08:26:04,903 - INFO - Cross-validated RMSE (rf): 57.61
+2025-05-02 08:26:04,968 - INFO - Model saved to output/diabetes_rf_model_20250502_082604.pkl
+2025-05-02 08:26:40,426 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 2, 'regressor__n_estimators': 50}
+2025-05-02 08:26:40,428 - INFO - Test Set Metrics (gb):
+2025-05-02 08:26:40,428 - INFO -   Mean Squared Error: 3747.51
+2025-05-02 08:26:40,428 - INFO -   Root Mean Squared Error: 61.22
+2025-05-02 08:26:40,428 - INFO -   Mean Absolute Error: 48.20
+2025-05-02 08:26:40,428 - INFO -   R² Score: 0.32
+2025-05-02 08:26:40,591 - INFO - Scatter plot saved to output/diabetes_gb_scatter_20250502_082640.png
+2025-05-02 08:26:40,751 - INFO - Residual plot saved to output/diabetes_gb_residuals_20250502_082640.png
+2025-05-02 08:26:40,937 - INFO - Feature importance plot saved to output/diabetes_gb_importances_20250502_082640.png
+2025-05-02 08:26:43,389 - INFO - Training Set RMSE (gb): 39.48
+2025-05-02 08:26:43,389 - INFO - Test Set RMSE (gb): 61.22
+2025-05-02 08:26:43,389 - INFO - Cross-validated RMSE (gb): 59.39
+2025-05-02 08:26:43,402 - INFO - Model saved to output/diabetes_gb_model_20250502_082643.pkl
+/Users/tim/Desktop/Work/Python_Practice/py3ml/lib/python3.11/site-packages/sklearn/model_selection/_search.py:317: UserWarning: The total space of parameters 8 is smaller than n_iter=10. Running 8 iterations. For exhaustive searches, use GridSearchCV.
+  warnings.warn(
+2025-05-02 08:26:49,772 - INFO - Best parameters for xgb: {'regressor__n_estimators': 50, 'regressor__max_depth': 2, 'regressor__learning_rate': 0.05}
+2025-05-02 08:26:49,775 - INFO - Test Set Metrics (xgb):
+2025-05-02 08:26:49,775 - INFO -   Mean Squared Error: 3903.98
+2025-05-02 08:26:49,775 - INFO -   Root Mean Squared Error: 62.48
+2025-05-02 08:26:49,775 - INFO -   Mean Absolute Error: 49.53
+2025-05-02 08:26:49,775 - INFO -   R² Score: 0.30
+2025-05-02 08:26:49,986 - INFO - Scatter plot saved to output/diabetes_xgb_scatter_20250502_082649.png
+2025-05-02 08:26:50,151 - INFO - Residual plot saved to output/diabetes_xgb_residuals_20250502_082649.png
+2025-05-02 08:26:50,338 - INFO - Feature importance plot saved to output/diabetes_xgb_importances_20250502_082650.png
+2025-05-02 08:26:50,744 - INFO - Training Set RMSE (xgb): 40.52
+2025-05-02 08:26:50,744 - INFO - Test Set RMSE (xgb): 62.48
+2025-05-02 08:26:50,744 - INFO - Cross-validated RMSE (xgb): 59.04
+2025-05-02 08:26:50,753 - INFO - Model saved to output/diabetes_xgb_model_20250502_082650.pkl
+2025-05-02 08:27:04,571 - INFO - Trained stacking model
+2025-05-02 08:27:04,581 - INFO - Test Set Metrics (stack):
+2025-05-02 08:27:04,581 - INFO -   Mean Squared Error: 3337.57
+2025-05-02 08:27:04,581 - INFO -   Root Mean Squared Error: 57.77
+2025-05-02 08:27:04,581 - INFO -   Mean Absolute Error: 46.19
+2025-05-02 08:27:04,581 - INFO -   R² Score: 0.40
+2025-05-02 08:27:04,788 - INFO - Scatter plot saved to output/diabetes_stack_scatter_20250502_082704.png
+2025-05-02 08:27:04,941 - INFO - Residual plot saved to output/diabetes_stack_residuals_20250502_082704.png
+2025-05-02 08:27:58,122 - INFO - Training Set RMSE (stack): 22.91
+2025-05-02 08:27:58,122 - INFO - Test Set RMSE (stack): 57.77
+2025-05-02 08:27:58,122 - INFO - Cross-validated RMSE (stack): 59.56
+2025-05-02 08:27:58,173 - INFO - Model saved to output/diabetes_stack_model_20250502_082758.pkl
+2025-05-02 08:27:58,248 - INFO - Trained linear regression model
+2025-05-02 08:27:58,251 - INFO - Test Set Metrics (lr):
+2025-05-02 08:27:58,251 - INFO -   Mean Squared Error: 69820.68
+2025-05-02 08:27:58,251 - INFO -   Root Mean Squared Error: 264.24
+2025-05-02 08:27:58,252 - INFO -   Mean Absolute Error: 185.52
+2025-05-02 08:27:58,252 - INFO -   R² Score: -11.59
+2025-05-02 08:27:58,444 - INFO - Scatter plot saved to output/diabetes_lr_scatter_20250502_082758.png
+2025-05-02 08:27:58,603 - INFO - Residual plot saved to output/diabetes_lr_residuals_20250502_082758.png
+2025-05-02 08:27:58,652 - INFO - Training Set RMSE (lr): 0.00
+2025-05-02 08:27:58,652 - INFO - Test Set RMSE (lr): 264.24
+2025-05-02 08:27:58,652 - INFO - Cross-validated RMSE (lr): 455.00
+2025-05-02 08:27:58,656 - INFO - Model saved to output/diabetes_lr_model_20250502_082758.pkl
+2025-05-02 08:27:58,738 - INFO - Reduced to 10 components, explained variance ratio: 0.65
+2025-05-02 08:28:03,706 - INFO - Best parameters for rf: {'regressor__max_depth': None, 'regressor__min_samples_split': 2, 'regressor__n_estimators': 50}
+2025-05-02 08:28:03,712 - INFO - Test Set Metrics (rf_pca):
+2025-05-02 08:28:03,712 - INFO -   Mean Squared Error: 4529.46
+2025-05-02 08:28:03,712 - INFO -   Root Mean Squared Error: 67.30
+2025-05-02 08:28:03,712 - INFO -   Mean Absolute Error: 53.23
+2025-05-02 08:28:03,712 - INFO -   R² Score: 0.18
+2025-05-02 08:28:03,877 - INFO - Scatter plot saved to output/diabetes_rf_pca_scatter_20250502_082803.png
+2025-05-02 08:28:04,050 - INFO - Residual plot saved to output/diabetes_rf_pca_residuals_20250502_082803.png
+2025-05-02 08:28:04,493 - INFO - Training Set RMSE (rf_pca): 23.47
+2025-05-02 08:28:04,494 - INFO - Test Set RMSE (rf_pca): 67.30
+2025-05-02 08:28:04,494 - INFO - Cross-validated RMSE (rf_pca): 60.53
+2025-05-02 08:28:04,522 - INFO - Model saved to output/diabetes_rf_pca_model_20250502_082804.pkl
+2025-05-02 08:28:05,444 - INFO - Best parameters for dt: {'regressor__max_depth': 10, 'regressor__min_samples_split': 5}
+2025-05-02 08:28:05,446 - INFO - Test Set Metrics (dt):
+2025-05-02 08:28:05,446 - INFO -   Mean Squared Error: 5970.65
+2025-05-02 08:28:05,446 - INFO -   Root Mean Squared Error: 77.27
+2025-05-02 08:28:05,446 - INFO -   Mean Absolute Error: 61.70
+2025-05-02 08:28:05,446 - INFO -   R² Score: -0.08
+2025-05-02 08:28:05,609 - INFO - Scatter plot saved to output/diabetes_dt_scatter_20250502_082805.png
+2025-05-02 08:28:05,774 - INFO - Residual plot saved to output/diabetes_dt_residuals_20250502_082805.png
+2025-05-02 08:28:05,976 - INFO - Feature importance plot saved to output/diabetes_dt_importances_20250502_082805.png
+2025-05-02 08:28:06,123 - INFO - Training Set RMSE (dt): 9.33
+2025-05-02 08:28:06,123 - INFO - Test Set RMSE (dt): 77.27
+2025-05-02 08:28:06,123 - INFO - Cross-validated RMSE (dt): 76.20
+2025-05-02 08:28:06,128 - INFO - Model saved to output/diabetes_dt_model_20250502_082806.pkl
+2025-05-02 08:28:06,347 - INFO - Best parameters for knn: {'regressor__n_neighbors': 7, 'regressor__weights': 'distance'}
+2025-05-02 08:28:06,350 - INFO - Test Set Metrics (knn):
+2025-05-02 08:28:06,350 - INFO -   Mean Squared Error: 3559.64
+2025-05-02 08:28:06,350 - INFO -   Root Mean Squared Error: 59.66
+2025-05-02 08:28:06,350 - INFO -   Mean Absolute Error: 48.78
+2025-05-02 08:28:06,350 - INFO -   R² Score: 0.36
+2025-05-02 08:28:06,554 - INFO - Scatter plot saved to output/diabetes_knn_scatter_20250502_082806.png
+2025-05-02 08:28:06,757 - INFO - Residual plot saved to output/diabetes_knn_residuals_20250502_082806.png
+2025-05-02 08:28:06,776 - INFO - Training Set RMSE (knn): 0.00
+2025-05-02 08:28:06,776 - INFO - Test Set RMSE (knn): 59.66
+2025-05-02 08:28:06,776 - INFO - Cross-validated RMSE (knn): 66.58
+2025-05-02 08:28:06,784 - INFO - Model saved to output/diabetes_knn_model_20250502_082806.pkl
+2025-05-02 08:28:06,989 - INFO - Best parameters for svr: {'regressor__C': 0.1, 'regressor__epsilon': 0.5}
+2025-05-02 08:28:06,992 - INFO - Test Set Metrics (svr):
+2025-05-02 08:28:06,992 - INFO -   Mean Squared Error: 2882.84
+2025-05-02 08:28:06,992 - INFO -   Root Mean Squared Error: 53.69
+2025-05-02 08:28:06,992 - INFO -   Mean Absolute Error: 41.78
+2025-05-02 08:28:06,992 - INFO -   R² Score: 0.48
+2025-05-02 08:28:07,179 - INFO - Scatter plot saved to output/diabetes_svr_scatter_20250502_082806.png
+2025-05-02 08:28:07,346 - INFO - Residual plot saved to output/diabetes_svr_residuals_20250502_082807.png
+2025-05-02 08:28:07,376 - INFO - Training Set RMSE (svr): 49.03
+2025-05-02 08:28:07,376 - INFO - Test Set RMSE (svr): 53.69
+2025-05-02 08:28:07,376 - INFO - Cross-validated RMSE (svr): 59.34
+2025-05-02 08:28:07,385 - INFO - Model saved to output/diabetes_svr_model_20250502_082807.pkl
+2025-05-02 08:29:07,023 - INFO - Best parameters for rf: {'regressor__max_depth': 10, 'regressor__min_samples_split': 5, 'regressor__n_estimators': 100}
+2025-05-02 08:35:59,018 - INFO - Selected 10 features
+2025-05-02 08:36:03,785 - INFO - Best parameters for rf: {'regressor__max_depth': None, 'regressor__min_samples_split': 5, 'regressor__n_estimators': 100}
+2025-05-02 08:36:03,794 - INFO - Test Set Metrics (rf_selected):
+2025-05-02 08:36:03,794 - INFO -   Mean Squared Error: 3514.75
+2025-05-02 08:36:03,794 - INFO -   Root Mean Squared Error: 59.29
+2025-05-02 08:36:03,795 - INFO -   Mean Absolute Error: 47.56
+2025-05-02 08:36:03,795 - INFO -   R² Score: 0.37
+2025-05-02 08:36:03,970 - INFO - Scatter plot saved to output/diabetes_rf_selected_scatter_20250502_083603.png
+2025-05-02 08:36:04,131 - INFO - Residual plot saved to output/diabetes_rf_selected_residuals_20250502_083603.png
+2025-05-02 08:36:04,882 - INFO - Training Set RMSE (rf_selected): 23.17
+2025-05-02 08:36:04,882 - INFO - Test Set RMSE (rf_selected): 59.29
+2025-05-02 08:36:04,882 - INFO - Cross-validated RMSE (rf_selected): 54.49
+2025-05-02 08:36:04,944 - INFO - Model saved to output/diabetes_rf_selected_model_20250502_083604.pkl
+2025-05-02 08:36:04,952 - INFO - Feature Importances (rf_selected):
+2025-05-02 08:36:04,952 - INFO -   bmi s5: 0.3147
+2025-05-02 08:36:04,952 - INFO -   bmi^2 s5: 0.1495
+2025-05-02 08:36:04,952 - INFO -   bmi s5^2: 0.1365
+2025-05-02 08:36:04,952 - INFO -   bmi s6^2: 0.0792
+2025-05-02 08:36:04,952 - INFO -   bp s5 bmi_bp_ratio: 0.0577
+2025-05-02 08:36:04,953 - INFO -   age^2 sex: 0.0565
+2025-05-02 08:36:04,953 - INFO -   age sex s5: 0.0543
+2025-05-02 08:36:04,953 - INFO -   age s2 s5: 0.0510
+2025-05-02 08:36:04,953 - INFO -   bp s6^2: 0.0507
+2025-05-02 08:36:04,953 - INFO -   s5^2: 0.0500
+2025-05-02 08:36:40,389 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 2, 'regressor__n_estimators': 50}
+2025-05-02 08:38:32,227 - INFO - Selected 10 features
+2025-05-02 08:38:34,725 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 2, 'regressor__n_estimators': 100}
+2025-05-02 08:38:34,727 - INFO - Test Set Metrics (gb_selected):
+2025-05-02 08:38:34,727 - INFO -   Mean Squared Error: 4369.00
+2025-05-02 08:38:34,727 - INFO -   Root Mean Squared Error: 66.10
+2025-05-02 08:38:34,727 - INFO -   Mean Absolute Error: 50.84
+2025-05-02 08:38:34,728 - INFO -   R² Score: 0.21
+2025-05-02 08:38:34,894 - INFO - Scatter plot saved to output/diabetes_gb_selected_scatter_20250502_083834.png
+2025-05-02 08:38:35,067 - INFO - Residual plot saved to output/diabetes_gb_selected_residuals_20250502_083834.png
+2025-05-02 08:38:35,440 - INFO - Training Set RMSE (gb_selected): 36.54
+2025-05-02 08:38:35,440 - INFO - Test Set RMSE (gb_selected): 66.10
+2025-05-02 08:38:35,440 - INFO - Cross-validated RMSE (gb_selected): 53.80
+2025-05-02 08:38:35,455 - INFO - Model saved to output/diabetes_gb_selected_model_20250502_083835.pkl
+2025-05-02 08:38:35,456 - INFO - Feature Importances (gb_selected):
+2025-05-02 08:38:35,456 - INFO -   bmi s5: 0.3306
+2025-05-02 08:38:35,456 - INFO -   bmi^2 s5: 0.2332
+2025-05-02 08:38:35,456 - INFO -   bmi s5^2: 0.0780
+2025-05-02 08:38:35,456 - INFO -   bp bmi_bp_ratio: 0.0689
+2025-05-02 08:38:35,456 - INFO -   age^2 sex: 0.0566
+2025-05-02 08:38:35,456 - INFO -   bmi s6: 0.0503
+2025-05-02 08:38:35,456 - INFO -   age bp: 0.0492
+2025-05-02 08:38:35,456 - INFO -   age sex bmi: 0.0461
+2025-05-02 08:38:35,456 - INFO -   s5^2: 0.0461
+2025-05-02 08:38:35,456 - INFO -   age s4^2: 0.0409
+2025-05-02 08:38:35,523 - INFO - Predicted progression: 114.96
+2025-05-02 08:38:35,523 - INFO - Predicted progression for new patient: 114.96
+2025-05-02 08:38:35,523 - INFO - Script completed in 813.94 seconds
+(py3ml) tim@Tims-MBP diabetes
+
+(py3ml) tim@Tims-MBP diabetes % date; ./diabetes.py; date
+Fri May  2 08:40:10 PDT 2025
+2025-05-02 08:40:12,992 - INFO - Starting diabetes prediction script at 2025-05-02 08:40:12.992048
+2025-05-02 08:40:12,995 - INFO - Dataset loaded successfully
+2025-05-02 08:40:12,995 - INFO - Dataset Information:
+2025-05-02 08:40:12,995 - INFO -   Description: Diabetes dataset
+2025-05-02 08:40:12,995 - INFO -   Sample Size: 200
+2025-05-02 08:40:12,996 - INFO -   Features: 10
+2025-05-02 08:40:12,996 - INFO -   Feature Names: ['age', 'sex', 'bmi', 'bp', 's1', 's2', 's3', 's4', 's5', 's6']
+2025-05-02 08:40:13,513 - INFO - Correlation heatmap saved to output/diabetes_heatmap_20250502_084013.png
+2025-05-02 08:40:13,514 - INFO - Polynomial feature count: 363
+2025-05-02 08:40:13,517 - INFO - Polynomial feature names: ['x0' 'x1' 'x2' 'x3' 'x4' 'x5' 'x6' 'x7' 'x8' 'x9' 'x10' 'x0^2' 'x0 x1'
+ 'x0 x2' 'x0 x3' 'x0 x4' 'x0 x5' 'x0 x6' 'x0 x7' 'x0 x8' 'x0 x9' 'x0 x10'
+ 'x1^2' 'x1 x2' 'x1 x3' 'x1 x4' 'x1 x5' 'x1 x6' 'x1 x7' 'x1 x8' 'x1 x9'
+ 'x1 x10' 'x2^2' 'x2 x3' 'x2 x4' 'x2 x5' 'x2 x6' 'x2 x7' 'x2 x8' 'x2 x9'
+ 'x2 x10' 'x3^2' 'x3 x4' 'x3 x5' 'x3 x6' 'x3 x7' 'x3 x8' 'x3 x9' 'x3 x10'
+ 'x4^2' 'x4 x5' 'x4 x6' 'x4 x7' 'x4 x8' 'x4 x9' 'x4 x10' 'x5^2' 'x5 x6'
+ 'x5 x7' 'x5 x8' 'x5 x9' 'x5 x10' 'x6^2' 'x6 x7' 'x6 x8' 'x6 x9' 'x6 x10'
+ 'x7^2' 'x7 x8' 'x7 x9' 'x7 x10' 'x8^2' 'x8 x9' 'x8 x10' 'x9^2' 'x9 x10'
+ 'x10^2' 'x0^3' 'x0^2 x1' 'x0^2 x2' 'x0^2 x3' 'x0^2 x4' 'x0^2 x5'
+ 'x0^2 x6' 'x0^2 x7' 'x0^2 x8' 'x0^2 x9' 'x0^2 x10' 'x0 x1^2' 'x0 x1 x2'
+ 'x0 x1 x3' 'x0 x1 x4' 'x0 x1 x5' 'x0 x1 x6' 'x0 x1 x7' 'x0 x1 x8'
+ 'x0 x1 x9' 'x0 x1 x10' 'x0 x2^2' 'x0 x2 x3' 'x0 x2 x4' 'x0 x2 x5'
+ 'x0 x2 x6' 'x0 x2 x7' 'x0 x2 x8' 'x0 x2 x9' 'x0 x2 x10' 'x0 x3^2'
+ 'x0 x3 x4' 'x0 x3 x5' 'x0 x3 x6' 'x0 x3 x7' 'x0 x3 x8' 'x0 x3 x9'
+ 'x0 x3 x10' 'x0 x4^2' 'x0 x4 x5' 'x0 x4 x6' 'x0 x4 x7' 'x0 x4 x8'
+ 'x0 x4 x9' 'x0 x4 x10' 'x0 x5^2' 'x0 x5 x6' 'x0 x5 x7' 'x0 x5 x8'
+ 'x0 x5 x9' 'x0 x5 x10' 'x0 x6^2' 'x0 x6 x7' 'x0 x6 x8' 'x0 x6 x9'
+ 'x0 x6 x10' 'x0 x7^2' 'x0 x7 x8' 'x0 x7 x9' 'x0 x7 x10' 'x0 x8^2'
+ 'x0 x8 x9' 'x0 x8 x10' 'x0 x9^2' 'x0 x9 x10' 'x0 x10^2' 'x1^3' 'x1^2 x2'
+ 'x1^2 x3' 'x1^2 x4' 'x1^2 x5' 'x1^2 x6' 'x1^2 x7' 'x1^2 x8' 'x1^2 x9'
+ 'x1^2 x10' 'x1 x2^2' 'x1 x2 x3' 'x1 x2 x4' 'x1 x2 x5' 'x1 x2 x6'
+ 'x1 x2 x7' 'x1 x2 x8' 'x1 x2 x9' 'x1 x2 x10' 'x1 x3^2' 'x1 x3 x4'
+ 'x1 x3 x5' 'x1 x3 x6' 'x1 x3 x7' 'x1 x3 x8' 'x1 x3 x9' 'x1 x3 x10'
+ 'x1 x4^2' 'x1 x4 x5' 'x1 x4 x6' 'x1 x4 x7' 'x1 x4 x8' 'x1 x4 x9'
+ 'x1 x4 x10' 'x1 x5^2' 'x1 x5 x6' 'x1 x5 x7' 'x1 x5 x8' 'x1 x5 x9'
+ 'x1 x5 x10' 'x1 x6^2' 'x1 x6 x7' 'x1 x6 x8' 'x1 x6 x9' 'x1 x6 x10'
+ 'x1 x7^2' 'x1 x7 x8' 'x1 x7 x9' 'x1 x7 x10' 'x1 x8^2' 'x1 x8 x9'
+ 'x1 x8 x10' 'x1 x9^2' 'x1 x9 x10' 'x1 x10^2' 'x2^3' 'x2^2 x3' 'x2^2 x4'
+ 'x2^2 x5' 'x2^2 x6' 'x2^2 x7' 'x2^2 x8' 'x2^2 x9' 'x2^2 x10' 'x2 x3^2'
+ 'x2 x3 x4' 'x2 x3 x5' 'x2 x3 x6' 'x2 x3 x7' 'x2 x3 x8' 'x2 x3 x9'
+ 'x2 x3 x10' 'x2 x4^2' 'x2 x4 x5' 'x2 x4 x6' 'x2 x4 x7' 'x2 x4 x8'
+ 'x2 x4 x9' 'x2 x4 x10' 'x2 x5^2' 'x2 x5 x6' 'x2 x5 x7' 'x2 x5 x8'
+ 'x2 x5 x9' 'x2 x5 x10' 'x2 x6^2' 'x2 x6 x7' 'x2 x6 x8' 'x2 x6 x9'
+ 'x2 x6 x10' 'x2 x7^2' 'x2 x7 x8' 'x2 x7 x9' 'x2 x7 x10' 'x2 x8^2'
+ 'x2 x8 x9' 'x2 x8 x10' 'x2 x9^2' 'x2 x9 x10' 'x2 x10^2' 'x3^3' 'x3^2 x4'
+ 'x3^2 x5' 'x3^2 x6' 'x3^2 x7' 'x3^2 x8' 'x3^2 x9' 'x3^2 x10' 'x3 x4^2'
+ 'x3 x4 x5' 'x3 x4 x6' 'x3 x4 x7' 'x3 x4 x8' 'x3 x4 x9' 'x3 x4 x10'
+ 'x3 x5^2' 'x3 x5 x6' 'x3 x5 x7' 'x3 x5 x8' 'x3 x5 x9' 'x3 x5 x10'
+ 'x3 x6^2' 'x3 x6 x7' 'x3 x6 x8' 'x3 x6 x9' 'x3 x6 x10' 'x3 x7^2'
+ 'x3 x7 x8' 'x3 x7 x9' 'x3 x7 x10' 'x3 x8^2' 'x3 x8 x9' 'x3 x8 x10'
+ 'x3 x9^2' 'x3 x9 x10' 'x3 x10^2' 'x4^3' 'x4^2 x5' 'x4^2 x6' 'x4^2 x7'
+ 'x4^2 x8' 'x4^2 x9' 'x4^2 x10' 'x4 x5^2' 'x4 x5 x6' 'x4 x5 x7' 'x4 x5 x8'
+ 'x4 x5 x9' 'x4 x5 x10' 'x4 x6^2' 'x4 x6 x7' 'x4 x6 x8' 'x4 x6 x9'
+ 'x4 x6 x10' 'x4 x7^2' 'x4 x7 x8' 'x4 x7 x9' 'x4 x7 x10' 'x4 x8^2'
+ 'x4 x8 x9' 'x4 x8 x10' 'x4 x9^2' 'x4 x9 x10' 'x4 x10^2' 'x5^3' 'x5^2 x6'
+ 'x5^2 x7' 'x5^2 x8' 'x5^2 x9' 'x5^2 x10' 'x5 x6^2' 'x5 x6 x7' 'x5 x6 x8'
+ 'x5 x6 x9' 'x5 x6 x10' 'x5 x7^2' 'x5 x7 x8' 'x5 x7 x9' 'x5 x7 x10'
+ 'x5 x8^2' 'x5 x8 x9' 'x5 x8 x10' 'x5 x9^2' 'x5 x9 x10' 'x5 x10^2' 'x6^3'
+ 'x6^2 x7' 'x6^2 x8' 'x6^2 x9' 'x6^2 x10' 'x6 x7^2' 'x6 x7 x8' 'x6 x7 x9'
+ 'x6 x7 x10' 'x6 x8^2' 'x6 x8 x9' 'x6 x8 x10' 'x6 x9^2' 'x6 x9 x10'
+ 'x6 x10^2' 'x7^3' 'x7^2 x8' 'x7^2 x9' 'x7^2 x10' 'x7 x8^2' 'x7 x8 x9'
+ 'x7 x8 x10' 'x7 x9^2' 'x7 x9 x10' 'x7 x10^2' 'x8^3' 'x8^2 x9' 'x8^2 x10'
+ 'x8 x9^2' 'x8 x9 x10' 'x8 x10^2' 'x9^3' 'x9^2 x10' 'x9 x10^2' 'x10^3']
+2025-05-02 08:40:13,522 - INFO - Dataset split into 160 training and 40 test samples
+2025-05-02 08:41:11,490 - INFO - Best parameters for rf: {'regressor__max_depth': 10, 'regressor__min_samples_split': 5, 'regressor__n_estimators': 100}
+2025-05-02 08:41:11,501 - INFO - Test Set Metrics (rf):
+2025-05-02 08:41:11,501 - INFO -   Mean Squared Error: 3400.84
+2025-05-02 08:41:11,501 - INFO -   Root Mean Squared Error: 58.32
+2025-05-02 08:41:11,501 - INFO -   Mean Absolute Error: 46.75
+2025-05-02 08:41:11,501 - INFO -   R² Score: 0.39
+2025-05-02 08:41:11,676 - INFO - Scatter plot saved to output/diabetes_rf_scatter_20250502_084111.png
+2025-05-02 08:41:11,840 - INFO - Residual plot saved to output/diabetes_rf_residuals_20250502_084111.png
+2025-05-02 08:41:12,032 - INFO - Feature importance plot saved to output/diabetes_rf_importances_20250502_084111.png
+2025-05-02 08:41:20,435 - INFO - Training Set RMSE (rf): 23.17
+2025-05-02 08:41:20,436 - INFO - Test Set RMSE (rf): 58.32
+2025-05-02 08:41:20,436 - INFO - Cross-validated RMSE (rf): 57.61
+2025-05-02 08:41:20,503 - INFO - Model saved to output/diabetes_rf_model_20250502_084120.pkl
+2025-05-02 08:41:57,519 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 2, 'regressor__n_estimators': 50}
+2025-05-02 08:41:57,521 - INFO - Test Set Metrics (gb):
+2025-05-02 08:41:57,521 - INFO -   Mean Squared Error: 3747.51
+2025-05-02 08:41:57,521 - INFO -   Root Mean Squared Error: 61.22
+2025-05-02 08:41:57,522 - INFO -   Mean Absolute Error: 48.20
+2025-05-02 08:41:57,522 - INFO -   R² Score: 0.32
+2025-05-02 08:41:57,684 - INFO - Scatter plot saved to output/diabetes_gb_scatter_20250502_084157.png
+2025-05-02 08:41:57,840 - INFO - Residual plot saved to output/diabetes_gb_residuals_20250502_084157.png
+2025-05-02 08:41:58,023 - INFO - Feature importance plot saved to output/diabetes_gb_importances_20250502_084157.png
+2025-05-02 08:42:00,559 - INFO - Training Set RMSE (gb): 39.48
+2025-05-02 08:42:00,559 - INFO - Test Set RMSE (gb): 61.22
+2025-05-02 08:42:00,559 - INFO - Cross-validated RMSE (gb): 59.39
+2025-05-02 08:42:00,572 - INFO - Model saved to output/diabetes_gb_model_20250502_084200.pkl
+/Users/tim/Desktop/Work/Python_Practice/py3ml/lib/python3.11/site-packages/sklearn/model_selection/_search.py:317: UserWarning: The total space of parameters 8 is smaller than n_iter=10. Running 8 iterations. For exhaustive searches, use GridSearchCV.
+  warnings.warn(
+2025-05-02 08:42:06,989 - INFO - Best parameters for xgb: {'regressor__n_estimators': 50, 'regressor__max_depth': 2, 'regressor__learning_rate': 0.05}
+2025-05-02 08:42:06,991 - INFO - Test Set Metrics (xgb):
+2025-05-02 08:42:06,991 - INFO -   Mean Squared Error: 3903.98
+2025-05-02 08:42:06,991 - INFO -   Root Mean Squared Error: 62.48
+2025-05-02 08:42:06,992 - INFO -   Mean Absolute Error: 49.53
+2025-05-02 08:42:06,992 - INFO -   R² Score: 0.30
+2025-05-02 08:42:07,198 - INFO - Scatter plot saved to output/diabetes_xgb_scatter_20250502_084206.png
+2025-05-02 08:42:07,360 - INFO - Residual plot saved to output/diabetes_xgb_residuals_20250502_084207.png
+2025-05-02 08:42:07,546 - INFO - Feature importance plot saved to output/diabetes_xgb_importances_20250502_084207.png
+2025-05-02 08:42:07,951 - INFO - Training Set RMSE (xgb): 40.52
+2025-05-02 08:42:07,951 - INFO - Test Set RMSE (xgb): 62.48
+2025-05-02 08:42:07,951 - INFO - Cross-validated RMSE (xgb): 59.04
+2025-05-02 08:42:07,956 - INFO - Model saved to output/diabetes_xgb_model_20250502_084207.pkl
+2025-05-02 08:42:21,736 - INFO - Trained stacking model
+2025-05-02 08:42:21,746 - INFO - Test Set Metrics (stack):
+2025-05-02 08:42:21,746 - INFO -   Mean Squared Error: 3337.57
+2025-05-02 08:42:21,746 - INFO -   Root Mean Squared Error: 57.77
+2025-05-02 08:42:21,746 - INFO -   Mean Absolute Error: 46.19
+2025-05-02 08:42:21,747 - INFO -   R² Score: 0.40
+2025-05-02 08:42:21,959 - INFO - Scatter plot saved to output/diabetes_stack_scatter_20250502_084221.png
+2025-05-02 08:42:22,112 - INFO - Residual plot saved to output/diabetes_stack_residuals_20250502_084221.png
+2025-05-02 08:43:14,884 - INFO - Training Set RMSE (stack): 22.91
+2025-05-02 08:43:14,884 - INFO - Test Set RMSE (stack): 57.77
+2025-05-02 08:43:14,884 - INFO - Cross-validated RMSE (stack): 59.56
+2025-05-02 08:43:14,929 - INFO - Model saved to output/diabetes_stack_model_20250502_084314.pkl
+2025-05-02 08:43:14,997 - INFO - Trained linear regression model
+2025-05-02 08:43:14,999 - INFO - Test Set Metrics (lr):
+2025-05-02 08:43:14,999 - INFO -   Mean Squared Error: 69820.68
+2025-05-02 08:43:14,999 - INFO -   Root Mean Squared Error: 264.24
+2025-05-02 08:43:14,999 - INFO -   Mean Absolute Error: 185.52
+2025-05-02 08:43:14,999 - INFO -   R² Score: -11.59
+2025-05-02 08:43:15,195 - INFO - Scatter plot saved to output/diabetes_lr_scatter_20250502_084315.png
+2025-05-02 08:43:15,350 - INFO - Residual plot saved to output/diabetes_lr_residuals_20250502_084315.png
+2025-05-02 08:43:15,394 - INFO - Training Set RMSE (lr): 0.00
+2025-05-02 08:43:15,394 - INFO - Test Set RMSE (lr): 264.24
+2025-05-02 08:43:15,394 - INFO - Cross-validated RMSE (lr): 455.00
+2025-05-02 08:43:15,399 - INFO - Model saved to output/diabetes_lr_model_20250502_084315.pkl
+2025-05-02 08:43:15,469 - INFO - Reduced to 10 components, explained variance ratio: 0.65
+2025-05-02 08:43:20,458 - INFO - Best parameters for rf: {'regressor__max_depth': None, 'regressor__min_samples_split': 2, 'regressor__n_estimators': 50}
+2025-05-02 08:43:20,463 - INFO - Test Set Metrics (rf_pca):
+2025-05-02 08:43:20,463 - INFO -   Mean Squared Error: 4529.46
+2025-05-02 08:43:20,463 - INFO -   Root Mean Squared Error: 67.30
+2025-05-02 08:43:20,463 - INFO -   Mean Absolute Error: 53.23
+2025-05-02 08:43:20,464 - INFO -   R² Score: 0.18
+2025-05-02 08:43:20,628 - INFO - Scatter plot saved to output/diabetes_rf_pca_scatter_20250502_084320.png
+2025-05-02 08:43:20,796 - INFO - Residual plot saved to output/diabetes_rf_pca_residuals_20250502_084320.png
+2025-05-02 08:43:21,244 - INFO - Training Set RMSE (rf_pca): 23.47
+2025-05-02 08:43:21,245 - INFO - Test Set RMSE (rf_pca): 67.30
+2025-05-02 08:43:21,245 - INFO - Cross-validated RMSE (rf_pca): 60.53
+2025-05-02 08:43:21,276 - INFO - Model saved to output/diabetes_rf_pca_model_20250502_084321.pkl
+2025-05-02 08:43:22,225 - INFO - Best parameters for dt: {'regressor__max_depth': 10, 'regressor__min_samples_split': 5}
+2025-05-02 08:43:22,227 - INFO - Test Set Metrics (dt):
+2025-05-02 08:43:22,227 - INFO -   Mean Squared Error: 5970.65
+2025-05-02 08:43:22,227 - INFO -   Root Mean Squared Error: 77.27
+2025-05-02 08:43:22,227 - INFO -   Mean Absolute Error: 61.70
+2025-05-02 08:43:22,227 - INFO -   R² Score: -0.08
+2025-05-02 08:43:22,388 - INFO - Scatter plot saved to output/diabetes_dt_scatter_20250502_084322.png
+2025-05-02 08:43:22,540 - INFO - Residual plot saved to output/diabetes_dt_residuals_20250502_084322.png
+2025-05-02 08:43:22,731 - INFO - Feature importance plot saved to output/diabetes_dt_importances_20250502_084322.png
+2025-05-02 08:43:22,878 - INFO - Training Set RMSE (dt): 9.33
+2025-05-02 08:43:22,878 - INFO - Test Set RMSE (dt): 77.27
+2025-05-02 08:43:22,878 - INFO - Cross-validated RMSE (dt): 76.20
+2025-05-02 08:43:22,883 - INFO - Model saved to output/diabetes_dt_model_20250502_084322.pkl
+2025-05-02 08:43:23,099 - INFO - Best parameters for knn: {'regressor__n_neighbors': 7, 'regressor__weights': 'distance'}
+2025-05-02 08:43:23,101 - INFO - Test Set Metrics (knn):
+2025-05-02 08:43:23,102 - INFO -   Mean Squared Error: 3559.64
+2025-05-02 08:43:23,102 - INFO -   Root Mean Squared Error: 59.66
+2025-05-02 08:43:23,102 - INFO -   Mean Absolute Error: 48.78
+2025-05-02 08:43:23,102 - INFO -   R² Score: 0.36
+2025-05-02 08:43:23,309 - INFO - Scatter plot saved to output/diabetes_knn_scatter_20250502_084323.png
+2025-05-02 08:43:23,483 - INFO - Residual plot saved to output/diabetes_knn_residuals_20250502_084323.png
+2025-05-02 08:43:23,499 - INFO - Training Set RMSE (knn): 0.00
+2025-05-02 08:43:23,499 - INFO - Test Set RMSE (knn): 59.66
+2025-05-02 08:43:23,499 - INFO - Cross-validated RMSE (knn): 66.58
+2025-05-02 08:43:23,505 - INFO - Model saved to output/diabetes_knn_model_20250502_084323.pkl
+2025-05-02 08:43:23,671 - INFO - Best parameters for svr: {'regressor__C': 0.1, 'regressor__epsilon': 0.5}
+2025-05-02 08:43:23,673 - INFO - Test Set Metrics (svr):
+2025-05-02 08:43:23,673 - INFO -   Mean Squared Error: 2882.84
+2025-05-02 08:43:23,673 - INFO -   Root Mean Squared Error: 53.69
+2025-05-02 08:43:23,673 - INFO -   Mean Absolute Error: 41.78
+2025-05-02 08:43:23,673 - INFO -   R² Score: 0.48
+2025-05-02 08:43:23,836 - INFO - Scatter plot saved to output/diabetes_svr_scatter_20250502_084323.png
+2025-05-02 08:43:23,999 - INFO - Residual plot saved to output/diabetes_svr_residuals_20250502_084323.png
+2025-05-02 08:43:24,026 - INFO - Training Set RMSE (svr): 49.03
+2025-05-02 08:43:24,026 - INFO - Test Set RMSE (svr): 53.69
+2025-05-02 08:43:24,026 - INFO - Cross-validated RMSE (svr): 59.34
+2025-05-02 08:43:24,033 - INFO - Model saved to output/diabetes_svr_model_20250502_084324.pkl
+2025-05-02 08:44:21,204 - INFO - Best parameters for rf: {'regressor__max_depth': 10, 'regressor__min_samples_split': 5, 'regressor__n_estimators': 100}
+2025-05-02 08:51:46,712 - INFO - Selected 10 features
+2025-05-02 08:51:52,702 - INFO - Best parameters for rf: {'regressor__max_depth': None, 'regressor__min_samples_split': 5, 'regressor__n_estimators': 100}
+2025-05-02 08:51:52,712 - INFO - Test Set Metrics (rf_selected):
+2025-05-02 08:51:52,712 - INFO -   Mean Squared Error: 3514.75
+2025-05-02 08:51:52,712 - INFO -   Root Mean Squared Error: 59.29
+2025-05-02 08:51:52,713 - INFO -   Mean Absolute Error: 47.56
+2025-05-02 08:51:52,713 - INFO -   R² Score: 0.37
+2025-05-02 08:51:52,922 - INFO - Scatter plot saved to output/diabetes_rf_selected_scatter_20250502_085152.png
+2025-05-02 08:51:53,137 - INFO - Residual plot saved to output/diabetes_rf_selected_residuals_20250502_085152.png
+2025-05-02 08:51:54,270 - INFO - Training Set RMSE (rf_selected): 23.17
+2025-05-02 08:51:54,270 - INFO - Test Set RMSE (rf_selected): 59.29
+2025-05-02 08:51:54,271 - INFO - Cross-validated RMSE (rf_selected): 54.49
+2025-05-02 08:51:54,384 - INFO - Model saved to output/diabetes_rf_selected_model_20250502_085154.pkl
+2025-05-02 08:51:54,391 - INFO - Feature Importances (rf_selected):
+2025-05-02 08:51:54,391 - INFO -   bmi s5: 0.3147
+2025-05-02 08:51:54,392 - INFO -   bmi^2 s5: 0.1495
+2025-05-02 08:51:54,392 - INFO -   bmi s5^2: 0.1365
+2025-05-02 08:51:54,392 - INFO -   bmi s6^2: 0.0792
+2025-05-02 08:51:54,392 - INFO -   bp s5 bmi_bp_ratio: 0.0577
+2025-05-02 08:51:54,392 - INFO -   age^2 sex: 0.0565
+2025-05-02 08:51:54,392 - INFO -   age sex s5: 0.0543
+2025-05-02 08:51:54,392 - INFO -   age s2 s5: 0.0510
+2025-05-02 08:51:54,392 - INFO -   bp s6^2: 0.0507
+2025-05-02 08:51:54,392 - INFO -   s5^2: 0.0500
+2025-05-02 08:52:34,811 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 2, 'regressor__n_estimators': 50}
+2025-05-02 08:54:44,568 - INFO - Selected 10 features
+2025-05-02 08:54:48,524 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 2, 'regressor__n_estimators': 100}
+2025-05-02 08:54:48,528 - INFO - Test Set Metrics (gb_selected):
+2025-05-02 08:54:48,528 - INFO -   Mean Squared Error: 4369.00
+2025-05-02 08:54:48,528 - INFO -   Root Mean Squared Error: 66.10
+2025-05-02 08:54:48,528 - INFO -   Mean Absolute Error: 50.84
+2025-05-02 08:54:48,529 - INFO -   R² Score: 0.21
+2025-05-02 08:54:48,880 - INFO - Scatter plot saved to output/diabetes_gb_selected_scatter_20250502_085448.png
+2025-05-02 08:54:49,279 - INFO - Residual plot saved to output/diabetes_gb_selected_residuals_20250502_085448.png
+2025-05-02 08:54:49,920 - INFO - Training Set RMSE (gb_selected): 36.54
+2025-05-02 08:54:49,920 - INFO - Test Set RMSE (gb_selected): 66.10
+2025-05-02 08:54:49,920 - INFO - Cross-validated RMSE (gb_selected): 53.80
+2025-05-02 08:54:49,943 - INFO - Model saved to output/diabetes_gb_selected_model_20250502_085449.pkl
+2025-05-02 08:54:49,944 - INFO - Feature Importances (gb_selected):
+2025-05-02 08:54:49,944 - INFO -   bmi s5: 0.3306
+2025-05-02 08:54:49,944 - INFO -   bmi^2 s5: 0.2332
+2025-05-02 08:54:49,944 - INFO -   bmi s5^2: 0.0780
+2025-05-02 08:54:49,944 - INFO -   bp bmi_bp_ratio: 0.0689
+2025-05-02 08:54:49,944 - INFO -   age^2 sex: 0.0566
+2025-05-02 08:54:49,945 - INFO -   bmi s6: 0.0503
+2025-05-02 08:54:49,945 - INFO -   age bp: 0.0492
+2025-05-02 08:54:49,945 - INFO -   age sex bmi: 0.0461
+2025-05-02 08:54:49,945 - INFO -   s5^2: 0.0461
+2025-05-02 08:54:49,945 - INFO -   age s4^2: 0.0409
+2025-05-02 08:54:50,064 - INFO - Predicted progression: 114.96
+2025-05-02 08:54:50,065 - INFO - Predicted progression for new patient: 114.96
+2025-05-02 08:54:50,065 - INFO - Script completed in 877.07 seconds
+Fri May  2 08:54:50 PDT 2025
+

@@ -1,0 +1,533 @@
+
+tim@Tims-MBP ~ % cd Documents/workspace/python3/machine-learning/breast_cancer
+tim@Tims-MBP diabetes % source ~/Desktop/Work/Python_Practice/py3ml/bin/activate
+
+(py3ml) tim@Tims-MBP breast_cancer % cat breast_cancer.py 
+#!/usr/bin/env python3
+# Breast Cancer Prediction: 569 samples from scikit-learn breast cancer dataset
+# Binary classification (malignant vs. benign) with multiple models
+# https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html
+
+import gc
+import glob
+import logging
+import time
+from datetime import datetime
+import joblib
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import seaborn as sns
+import psutil
+import os
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.model_selection import cross_val_score, train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from xgboost import XGBClassifier
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("output/breast_cancer.log"),
+        logging.StreamHandler()
+    ]
+)
+
+def log_memory_usage():
+    """Log current memory usage."""
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    logging.info("Memory usage: %.2f MB", mem_info.rss / 1024 / 1024)
+
+def save_plot(fig, save_path, title):
+    """Save a plot and ensure figure is closed."""
+    try:
+        fig.savefig(save_path, dpi=80, bbox_inches="tight")
+        logging.info("%s saved to %s", title, save_path)
+        plt.close(fig)
+    except Exception as e:
+        logging.error("Error saving %s: %s", title, e)
+
+def load_dataset():
+    """Load the breast cancer dataset."""
+    try:
+        data = load_breast_cancer()
+        X, y = data.data, data.target
+        logging.info("Dataset loaded: %d samples, %d features", X.shape[0], X.shape[1])
+        log_memory_usage()
+        return X, y, data
+    except Exception as e:
+        logging.error("Error loading dataset: %s", e)
+        return None, None, None
+
+def split_dataset(X, y, test_size=0.2, random_state=42):
+    """Split and scale the dataset."""
+    try:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+        logging.info("Dataset split: %d training, %d test samples", len(X_train), len(X_test))
+        log_memory_usage()
+        return X_train, X_test, y_train, y_test, scaler
+    except Exception as e:
+        logging.error("Error splitting dataset: %s", e)
+        return None, None, None, None, None
+
+def reduce_dimensions(X_train, X_test, n_components=15):
+    """Apply PCA for dimensionality reduction."""
+    try:
+        pca = PCA(n_components=n_components)
+        X_train_pca = pca.fit_transform(X_train)
+        X_test_pca = pca.transform(X_test)
+        logging.info("Reduced to %d components, explained variance ratio: %.2f", n_components, sum(pca.explained_variance_ratio_))
+        log_memory_usage()
+        return X_train_pca, X_test_pca, pca
+    except Exception as e:
+        logging.error("Error reducing dimensions: %s", e)
+        return None, None, None
+
+def train_model(X_train, y_train, model_type="rf", cv=5):
+    """Train a model with hyperparameter tuning."""
+    try:
+        logging.info("Initializing model: %s", model_type)
+        if model_type == "rf":
+            param_grid = {'regressor__n_estimators': [50], 'regressor__max_depth': [5]}
+            model = RandomForestClassifier(random_state=42)
+        elif model_type == "gb":
+            param_grid = {'regressor__n_estimators': [100], 'regressor__learning_rate': [0.05], 'regressor__max_depth': [3]}
+            model = GradientBoostingClassifier(random_state=42)
+        elif model_type == "knn":
+            param_grid = {'regressor__n_neighbors': [3], 'regressor__weights': ['uniform']}
+            model = KNeighborsClassifier()
+        elif model_type == "svc":
+            param_grid = {'regressor__C': [0.1], 'regressor__kernel': ['rbf']}
+            model = SVC(random_state=42)
+        elif model_type == "lr":
+            param_grid = {'regressor__C': [0.1], 'regressor__solver': ['liblinear']}
+            model = LogisticRegression(max_iter=300, random_state=42)
+        elif model_type == "mlp":
+            param_grid = {'regressor__hidden_layer_sizes': [(20,)], 'regressor__alpha': [0.05]}
+            model = MLPClassifier(max_iter=1000, random_state=42)
+        elif model_type == "xgb":
+            param_grid = {'regressor__n_estimators': [50], 'regressor__max_depth': [3], 'regressor__learning_rate': [0.1]}
+            model = XGBClassifier(random_state=42, eval_metric='logloss')
+        else:
+            logging.error("Unsupported model type: %s", model_type)
+            return None
+        pipeline = Pipeline([('regressor', model)])
+        grid_search = GridSearchCV(pipeline, param_grid, cv=cv, scoring='accuracy', n_jobs=1)
+        logging.info("Starting GridSearchCV for %s", model_type)
+        grid_search.fit(X_train, y_train)
+        logging.info("Best parameters for %s: %s", model_type, grid_search.best_params_)
+        log_memory_usage()
+        return grid_search.best_estimator_
+    except Exception as e:
+        logging.error("Error training %s model: %s", model_type, e)
+        return None
+
+def evaluate_model(model, X_test, y_test, data, debug=False, model_type="rf"):
+    """Evaluate model performance."""
+    try:
+        predictions = model.predict(X_test)
+        accuracy = accuracy_score(y_test, predictions)
+        cm = confusion_matrix(y_test, predictions)
+        report = classification_report(y_test, predictions, output_dict=True, zero_division=0)
+        logging.info("Test Set Metrics (%s):", model_type)
+        logging.info("  Accuracy: %.2f", accuracy)
+        logging.info("  Confusion Matrix:\n%s", cm)
+        logging.info("  Classification Report:\n%s", pd.DataFrame(report).transpose().to_string())
+        if debug:
+            save_path = f"output/breast_cancer_{model_type}_cm_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            fig = plt.figure(figsize=(8, 6))
+            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=data.target_names, yticklabels=data.target_names)
+            plt.title(f"{model_type.upper()} Confusion Matrix")
+            plt.xlabel("Predicted")
+            plt.ylabel("Actual")
+            save_plot(fig, save_path, "Confusion matrix")
+            if model_type in ["rf", "gb", "xgb"]:
+                importances = model.named_steps['regressor'].feature_importances_
+                importance_save_path = f"output/breast_cancer_{model_type}_importances_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                fig = plt.figure(figsize=(10, 6))
+                top_indices = np.argsort(importances)[-10:]
+                top_importances = importances[top_indices]
+                top_names = [f"feature_{i}" for i in top_indices]
+                sns.barplot(x=top_importances, y=top_names)
+                plt.title(f"{model_type.upper()} Feature Importances")
+                save_plot(fig, importance_save_path, "Feature importance plot")
+        log_memory_usage()
+        return {"accuracy": accuracy, "cm": cm, "report": report}
+    except Exception as e:
+        logging.error("Error evaluating %s model: %s", model_type, e)
+        return None
+
+def measure_model(model, X_train, y_train, X_test, y_test, model_type="rf"):
+    """Measure model performance with cross-validation."""
+    try:
+        train_pred = model.predict(X_train)
+        train_accuracy = accuracy_score(y_train, train_pred)
+        test_pred = model.predict(X_test)
+        test_accuracy = accuracy_score(y_test, test_pred)
+        cv_scores = cross_val_score(model, X_train, y_train, cv=3, scoring='accuracy')
+        logging.info("Training Set Accuracy (%s): %.2f", model_type, train_accuracy)
+        logging.info("Test Set Accuracy (%s): %.2f", model_type, test_accuracy)
+        logging.info("Cross-validated Accuracy (%s): %.2f", model_type, cv_scores.mean())
+        log_memory_usage()
+    except Exception as e:
+        logging.error("Error measuring %s model: %s", model_type, e)
+
+def save_model(model, scaler, model_type="rf"):
+    """Save model and scaler."""
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"output/breast_cancer_{model_type}_model_{timestamp}.pkl"
+        joblib.dump(model, filename)
+        joblib.dump(scaler, f"output/scaler_{timestamp}.pkl")
+        joblib.dump(model, f"output/breast_cancer_{model_type}_model_latest.pkl")
+        joblib.dump(scaler, "output/scaler.pkl")
+        logging.info("Model saved to %s", filename)
+        log_memory_usage()
+    except Exception as e:
+        logging.error("Error saving %s model: %s", model_type, e)
+
+def debug(X, y, data, debug_mode=False):
+    """Log dataset details and generate correlation heatmap."""
+    try:
+        feature_names = data.feature_names
+        logging.debug("Features: %s", feature_names)
+        logging.debug("Target: Malignant (0), Benign (1)")
+        logging.debug("Sample Size: %d", X.shape[0])
+        logging.debug("Features: %d", X.shape[1])
+        df = pd.DataFrame(X, columns=feature_names)
+        logging.debug("Sample:\n%s", df.iloc[0:2])
+        logging.debug("Summary Statistics:\n%s", df.describe())
+        logging.debug("Target Distribution:\n%s", pd.Series(y).value_counts().to_string())
+        if debug_mode:
+            save_path = f"output/breast_cancer_heatmap_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            fig = plt.figure(figsize=(10, 8))
+            sns.heatmap(df.corr(), cmap='coolwarm', annot=False)
+            plt.title("Feature Correlation Heatmap")
+            save_plot(fig, save_path, "Correlation heatmap")
+        log_memory_usage()
+    except Exception as e:
+        logging.error("Error debugging dataset: %s", e)
+
+def main():
+    """Main function to train and evaluate models."""
+    start_time = time.time()
+    logging.info("Starting breast cancer prediction script at %s", datetime.now())
+    
+    # Create output directory
+    os.makedirs("output", exist_ok=True)
+    
+    # Load and preprocess data
+    X, y, data = load_dataset()
+    if X is None or y is None:
+        logging.error("Failed to load dataset")
+        return
+    debug(X, y, data, debug_mode=True)
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    if X_train is None:
+        logging.error("Failed to split dataset")
+        return
+
+    # Train and evaluate models
+    model_types = ["rf", "gb", "knn", "svc", "lr", "mlp", "xgb", "rf_pca"]
+    metrics_summary = []
+    for model_type in model_types:
+        logging.info("Processing model: %s", model_type)
+        try:
+            if model_type == "rf_pca":
+                X_train_pca, X_test_pca, pca = reduce_dimensions(X_train, X_test, n_components=15)
+                if X_train_pca is None:
+                    logging.error("Failed to reduce dimensions for rf_pca")
+                    continue
+                model = train_model(X_train_pca, y_train, model_type="rf")
+                if model is None:
+                    logging.error("Failed to train rf_pca model")
+                    continue
+                metrics = evaluate_model(model, X_test_pca, y_test, data, debug=True, model_type="rf_pca")
+                measure_model(model, X_train_pca, y_train, X_test_pca, y_test, model_type="rf_pca")
+                save_model(model, scaler, model_type="rf_pca")
+                if metrics:
+                    metrics_summary.append({
+                        "model": model_type,
+                        "accuracy": metrics["accuracy"],
+                        "precision": metrics["report"]["weighted avg"]["precision"],
+                        "recall": metrics["report"]["weighted avg"]["recall"],
+                        "f1-score": metrics["report"]["weighted avg"]["f1-score"]
+                    })
+                del X_train_pca, X_test_pca, pca, metrics
+            else:
+                model = train_model(X_train, y_train, model_type=model_type)
+                if model is None:
+                    logging.error("Failed to train %s model", model_type)
+                    continue
+                metrics = evaluate_model(model, X_test, y_test, data, debug=True, model_type=model_type)
+                measure_model(model, X_train, y_train, X_test, y_test, model_type=model_type)
+                save_model(model, scaler, model_type=model_type)
+                if metrics:
+                    metrics_summary.append({
+                        "model": model_type,
+                        "accuracy": metrics["accuracy"],
+                        "precision": metrics["report"]["weighted avg"]["precision"],
+                        "recall": metrics["report"]["weighted avg"]["recall"],
+                        "f1-score": metrics["report"]["weighted avg"]["f1-score"]
+                    })
+                del metrics
+            del model
+            gc.collect()
+            log_memory_usage()
+        except Exception as e:
+            logging.error("Error processing %s model: %s", model_type, e)
+            continue
+
+    # Save metrics summary to CSV
+    if metrics_summary:
+        pd.DataFrame(metrics_summary).to_csv("output/breast_cancer_metrics.csv", index=False)
+        logging.info("Metrics summary saved to output/breast_cancer_metrics.csv")
+
+    logging.info("Script completed in %.2f seconds", time.time() - start_time)
+
+if __name__ == "__main__":
+    main()
+
+(py3ml) tim@Tims-MBP breast_cancer % date; ./breast_cancer.py; date
+Fri May  2 14:50:10 PDT 2025
+2025-05-02 14:50:12,637 - INFO - Starting breast cancer prediction script at 2025-05-02 14:50:12.637386
+2025-05-02 14:50:12,646 - INFO - Dataset loaded: 569 samples, 30 features
+2025-05-02 14:50:12,646 - INFO - Memory usage: 150.54 MB
+2025-05-02 14:50:13,400 - INFO - Correlation heatmap saved to output/breast_cancer_heatmap_20250502_145012.png
+2025-05-02 14:50:13,400 - INFO - Memory usage: 159.59 MB
+2025-05-02 14:50:13,404 - INFO - Dataset split: 455 training, 114 test samples
+2025-05-02 14:50:13,404 - INFO - Memory usage: 159.70 MB
+2025-05-02 14:50:13,404 - INFO - Processing model: rf
+2025-05-02 14:50:13,405 - INFO - Initializing model: rf
+2025-05-02 14:50:13,405 - INFO - Starting GridSearchCV for rf
+2025-05-02 14:50:14,270 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 14:50:14,270 - INFO - Memory usage: 160.50 MB
+2025-05-02 14:50:14,285 - INFO - Test Set Metrics (rf):
+2025-05-02 14:50:14,285 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:14,285 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 1 70]]
+2025-05-02 14:50:14,289 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.975610  0.930233  0.952381   43.000000
+1              0.958904  0.985915  0.972222   71.000000
+accuracy       0.964912  0.964912  0.964912    0.964912
+macro avg      0.967257  0.958074  0.962302  114.000000
+weighted avg   0.965205  0.964912  0.964738  114.000000
+2025-05-02 14:50:14,475 - INFO - Confusion matrix saved to output/breast_cancer_rf_cm_20250502_145014.png
+2025-05-02 14:50:14,686 - INFO - Feature importance plot saved to output/breast_cancer_rf_importances_20250502_145014.png
+2025-05-02 14:50:14,686 - INFO - Memory usage: 163.98 MB
+2025-05-02 14:50:15,060 - INFO - Training Set Accuracy (rf): 0.99
+2025-05-02 14:50:15,060 - INFO - Test Set Accuracy (rf): 0.96
+2025-05-02 14:50:15,060 - INFO - Cross-validated Accuracy (rf): 0.95
+2025-05-02 14:50:15,060 - INFO - Memory usage: 164.30 MB
+2025-05-02 14:50:15,110 - INFO - Model saved to output/breast_cancer_rf_model_20250502_145015.pkl
+2025-05-02 14:50:15,110 - INFO - Memory usage: 164.50 MB
+2025-05-02 14:50:15,192 - INFO - Memory usage: 163.64 MB
+2025-05-02 14:50:15,192 - INFO - Processing model: gb
+2025-05-02 14:50:15,192 - INFO - Initializing model: gb
+2025-05-02 14:50:15,193 - INFO - Starting GridSearchCV for gb
+2025-05-02 14:50:18,941 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 3, 'regressor__n_estimators': 100}
+2025-05-02 14:50:18,942 - INFO - Memory usage: 164.14 MB
+2025-05-02 14:50:18,951 - INFO - Test Set Metrics (gb):
+2025-05-02 14:50:18,952 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:18,952 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 2 69]]
+2025-05-02 14:50:18,956 - INFO -   Classification Report:
+              precision    recall  f1-score    support
+0              0.952381  0.930233  0.941176   43.00000
+1              0.958333  0.971831  0.965035   71.00000
+accuracy       0.956140  0.956140  0.956140    0.95614
+macro avg      0.955357  0.951032  0.953106  114.00000
+weighted avg   0.956088  0.956140  0.956036  114.00000
+2025-05-02 14:50:19,101 - INFO - Confusion matrix saved to output/breast_cancer_gb_cm_20250502_145018.png
+2025-05-02 14:50:19,257 - INFO - Feature importance plot saved to output/breast_cancer_gb_importances_20250502_145019.png
+2025-05-02 14:50:19,258 - INFO - Memory usage: 164.21 MB
+2025-05-02 14:50:20,706 - INFO - Training Set Accuracy (gb): 1.00
+2025-05-02 14:50:20,706 - INFO - Test Set Accuracy (gb): 0.96
+2025-05-02 14:50:20,707 - INFO - Cross-validated Accuracy (gb): 0.95
+2025-05-02 14:50:20,707 - INFO - Memory usage: 164.28 MB
+2025-05-02 14:50:20,728 - INFO - Model saved to output/breast_cancer_gb_model_20250502_145020.pkl
+2025-05-02 14:50:20,728 - INFO - Memory usage: 164.62 MB
+2025-05-02 14:50:20,793 - INFO - Memory usage: 164.62 MB
+2025-05-02 14:50:20,794 - INFO - Processing model: knn
+2025-05-02 14:50:20,794 - INFO - Initializing model: knn
+2025-05-02 14:50:20,794 - INFO - Starting GridSearchCV for knn
+2025-05-02 14:50:20,891 - INFO - Best parameters for knn: {'regressor__n_neighbors': 3, 'regressor__weights': 'uniform'}
+2025-05-02 14:50:20,891 - INFO - Memory usage: 165.43 MB
+2025-05-02 14:50:20,907 - INFO - Test Set Metrics (knn):
+2025-05-02 14:50:20,907 - INFO -   Accuracy: 0.95
+2025-05-02 14:50:20,907 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 3 68]]
+2025-05-02 14:50:20,913 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.930233  0.930233  0.930233   43.000000
+1              0.957746  0.957746  0.957746   71.000000
+accuracy       0.947368  0.947368  0.947368    0.947368
+macro avg      0.943990  0.943990  0.943990  114.000000
+weighted avg   0.947368  0.947368  0.947368  114.000000
+2025-05-02 14:50:21,080 - INFO - Confusion matrix saved to output/breast_cancer_knn_cm_20250502_145020.png
+2025-05-02 14:50:21,080 - INFO - Memory usage: 167.10 MB
+2025-05-02 14:50:21,099 - INFO - Training Set Accuracy (knn): 0.98
+2025-05-02 14:50:21,099 - INFO - Test Set Accuracy (knn): 0.95
+2025-05-02 14:50:21,099 - INFO - Cross-validated Accuracy (knn): 0.96
+2025-05-02 14:50:21,100 - INFO - Memory usage: 168.05 MB
+2025-05-02 14:50:21,104 - INFO - Model saved to output/breast_cancer_knn_model_20250502_145021.pkl
+2025-05-02 14:50:21,104 - INFO - Memory usage: 168.05 MB
+2025-05-02 14:50:21,190 - INFO - Memory usage: 162.79 MB
+2025-05-02 14:50:21,190 - INFO - Processing model: svc
+2025-05-02 14:50:21,190 - INFO - Initializing model: svc
+2025-05-02 14:50:21,190 - INFO - Starting GridSearchCV for svc
+2025-05-02 14:50:21,268 - INFO - Best parameters for svc: {'regressor__C': 0.1, 'regressor__kernel': 'rbf'}
+2025-05-02 14:50:21,268 - INFO - Memory usage: 163.25 MB
+2025-05-02 14:50:21,283 - INFO - Test Set Metrics (svc):
+2025-05-02 14:50:21,283 - INFO -   Accuracy: 0.95
+2025-05-02 14:50:21,283 - INFO -   Confusion Matrix:
+[[39  4]
+ [ 2 69]]
+2025-05-02 14:50:21,286 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.951220  0.906977  0.928571   43.000000
+1              0.945205  0.971831  0.958333   71.000000
+accuracy       0.947368  0.947368  0.947368    0.947368
+macro avg      0.948212  0.939404  0.943452  114.000000
+weighted avg   0.947474  0.947368  0.947107  114.000000
+2025-05-02 14:50:21,465 - INFO - Confusion matrix saved to output/breast_cancer_svc_cm_20250502_145021.png
+2025-05-02 14:50:21,466 - INFO - Memory usage: 165.09 MB
+2025-05-02 14:50:21,510 - INFO - Training Set Accuracy (svc): 0.96
+2025-05-02 14:50:21,510 - INFO - Test Set Accuracy (svc): 0.95
+2025-05-02 14:50:21,510 - INFO - Cross-validated Accuracy (svc): 0.93
+2025-05-02 14:50:21,510 - INFO - Memory usage: 165.12 MB
+2025-05-02 14:50:21,514 - INFO - Model saved to output/breast_cancer_svc_model_20250502_145021.pkl
+2025-05-02 14:50:21,515 - INFO - Memory usage: 165.13 MB
+2025-05-02 14:50:21,581 - INFO - Memory usage: 163.96 MB
+2025-05-02 14:50:21,581 - INFO - Processing model: lr
+2025-05-02 14:50:21,581 - INFO - Initializing model: lr
+2025-05-02 14:50:21,582 - INFO - Starting GridSearchCV for lr
+2025-05-02 14:50:21,611 - INFO - Best parameters for lr: {'regressor__C': 0.1, 'regressor__solver': 'liblinear'}
+2025-05-02 14:50:21,611 - INFO - Memory usage: 164.08 MB
+2025-05-02 14:50:21,626 - INFO - Test Set Metrics (lr):
+2025-05-02 14:50:21,626 - INFO -   Accuracy: 0.99
+2025-05-02 14:50:21,626 - INFO -   Confusion Matrix:
+[[42  1]
+ [ 0 71]]
+2025-05-02 14:50:21,631 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.976744  0.988235   43.000000
+1              0.986111  1.000000  0.993007   71.000000
+accuracy       0.991228  0.991228  0.991228    0.991228
+macro avg      0.993056  0.988372  0.990621  114.000000
+weighted avg   0.991350  0.991228  0.991207  114.000000
+2025-05-02 14:50:21,840 - INFO - Confusion matrix saved to output/breast_cancer_lr_cm_20250502_145021.png
+2025-05-02 14:50:21,840 - INFO - Memory usage: 164.08 MB
+2025-05-02 14:50:21,862 - INFO - Training Set Accuracy (lr): 0.98
+2025-05-02 14:50:21,862 - INFO - Test Set Accuracy (lr): 0.99
+2025-05-02 14:50:21,862 - INFO - Cross-validated Accuracy (lr): 0.97
+2025-05-02 14:50:21,862 - INFO - Memory usage: 164.09 MB
+2025-05-02 14:50:21,867 - INFO - Model saved to output/breast_cancer_lr_model_20250502_145021.pkl
+2025-05-02 14:50:21,867 - INFO - Memory usage: 164.09 MB
+2025-05-02 14:50:21,933 - INFO - Memory usage: 164.09 MB
+2025-05-02 14:50:21,933 - INFO - Processing model: mlp
+2025-05-02 14:50:21,934 - INFO - Initializing model: mlp
+2025-05-02 14:50:21,934 - INFO - Starting GridSearchCV for mlp
+2025-05-02 14:50:24,280 - INFO - Best parameters for mlp: {'regressor__alpha': 0.05, 'regressor__hidden_layer_sizes': (20,)}
+2025-05-02 14:50:24,285 - INFO - Memory usage: 164.45 MB
+2025-05-02 14:50:24,293 - INFO - Test Set Metrics (mlp):
+2025-05-02 14:50:24,293 - INFO -   Accuracy: 0.98
+2025-05-02 14:50:24,293 - INFO -   Confusion Matrix:
+[[42  1]
+ [ 1 70]]
+2025-05-02 14:50:24,295 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.976744  0.976744  0.976744   43.000000
+1              0.985915  0.985915  0.985915   71.000000
+accuracy       0.982456  0.982456  0.982456    0.982456
+macro avg      0.981330  0.981330  0.981330  114.000000
+weighted avg   0.982456  0.982456  0.982456  114.000000
+2025-05-02 14:50:24,451 - INFO - Confusion matrix saved to output/breast_cancer_mlp_cm_20250502_145024.png
+2025-05-02 14:50:24,451 - INFO - Memory usage: 164.45 MB
+2025-05-02 14:50:25,461 - INFO - Training Set Accuracy (mlp): 0.99
+2025-05-02 14:50:25,462 - INFO - Test Set Accuracy (mlp): 0.98
+2025-05-02 14:50:25,462 - INFO - Cross-validated Accuracy (mlp): 0.97
+2025-05-02 14:50:25,462 - INFO - Memory usage: 164.66 MB
+2025-05-02 14:50:25,477 - INFO - Model saved to output/breast_cancer_mlp_model_20250502_145025.pkl
+2025-05-02 14:50:25,477 - INFO - Memory usage: 164.66 MB
+2025-05-02 14:50:25,546 - INFO - Memory usage: 164.66 MB
+2025-05-02 14:50:25,546 - INFO - Processing model: xgb
+2025-05-02 14:50:25,546 - INFO - Initializing model: xgb
+2025-05-02 14:50:25,546 - INFO - Starting GridSearchCV for xgb
+2025-05-02 14:50:26,118 - INFO - Best parameters for xgb: {'regressor__learning_rate': 0.1, 'regressor__max_depth': 3, 'regressor__n_estimators': 50}
+2025-05-02 14:50:26,118 - INFO - Memory usage: 164.43 MB
+2025-05-02 14:50:26,128 - INFO - Test Set Metrics (xgb):
+2025-05-02 14:50:26,128 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:26,129 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 2 69]]
+2025-05-02 14:50:26,131 - INFO -   Classification Report:
+              precision    recall  f1-score    support
+0              0.952381  0.930233  0.941176   43.00000
+1              0.958333  0.971831  0.965035   71.00000
+accuracy       0.956140  0.956140  0.956140    0.95614
+macro avg      0.955357  0.951032  0.953106  114.00000
+weighted avg   0.956088  0.956140  0.956036  114.00000
+2025-05-02 14:50:26,298 - INFO - Confusion matrix saved to output/breast_cancer_xgb_cm_20250502_145026.png
+2025-05-02 14:50:26,465 - INFO - Feature importance plot saved to output/breast_cancer_xgb_importances_20250502_145026.png
+2025-05-02 14:50:26,466 - INFO - Memory usage: 166.95 MB
+2025-05-02 14:50:26,732 - INFO - Training Set Accuracy (xgb): 1.00
+2025-05-02 14:50:26,732 - INFO - Test Set Accuracy (xgb): 0.96
+2025-05-02 14:50:26,732 - INFO - Cross-validated Accuracy (xgb): 0.96
+2025-05-02 14:50:26,732 - INFO - Memory usage: 164.81 MB
+2025-05-02 14:50:26,737 - INFO - Model saved to output/breast_cancer_xgb_model_20250502_145026.pkl
+2025-05-02 14:50:26,737 - INFO - Memory usage: 164.81 MB
+2025-05-02 14:50:26,800 - INFO - Memory usage: 164.81 MB
+2025-05-02 14:50:26,800 - INFO - Processing model: rf_pca
+2025-05-02 14:50:26,801 - INFO - Reduced to 15 components, explained variance ratio: 0.99
+2025-05-02 14:50:26,802 - INFO - Memory usage: 164.93 MB
+2025-05-02 14:50:26,802 - INFO - Initializing model: rf
+2025-05-02 14:50:26,802 - INFO - Starting GridSearchCV for rf
+2025-05-02 14:50:27,459 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 14:50:27,459 - INFO - Memory usage: 164.93 MB
+2025-05-02 14:50:27,470 - INFO - Test Set Metrics (rf_pca):
+2025-05-02 14:50:27,470 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:27,470 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 2 69]]
+2025-05-02 14:50:27,473 - INFO -   Classification Report:
+              precision    recall  f1-score    support
+0              0.952381  0.930233  0.941176   43.00000
+1              0.958333  0.971831  0.965035   71.00000
+accuracy       0.956140  0.956140  0.956140    0.95614
+macro avg      0.955357  0.951032  0.953106  114.00000
+weighted avg   0.956088  0.956140  0.956036  114.00000
+2025-05-02 14:50:27,621 - INFO - Confusion matrix saved to output/breast_cancer_rf_pca_cm_20250502_145027.png
+2025-05-02 14:50:27,622 - INFO - Memory usage: 168.05 MB
+2025-05-02 14:50:27,908 - INFO - Training Set Accuracy (rf_pca): 0.98
+2025-05-02 14:50:27,909 - INFO - Test Set Accuracy (rf_pca): 0.96
+2025-05-02 14:50:27,909 - INFO - Cross-validated Accuracy (rf_pca): 0.93
+2025-05-02 14:50:27,909 - INFO - Memory usage: 168.11 MB
+2025-05-02 14:50:27,956 - INFO - Model saved to output/breast_cancer_rf_pca_model_20250502_145027.pkl
+2025-05-02 14:50:27,957 - INFO - Memory usage: 166.98 MB
+2025-05-02 14:50:28,019 - INFO - Memory usage: 166.39 MB
+2025-05-02 14:50:28,022 - INFO - Metrics summary saved to output/breast_cancer_metrics.csv
+2025-05-02 14:50:28,022 - INFO - Script completed in 15.38 seconds
+Fri May  2 14:50:28 PDT 2025
+(py3ml) tim@Tims-MBP breast_cancer %                               
+

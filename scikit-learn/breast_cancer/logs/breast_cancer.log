@@ -1,0 +1,222 @@
+2025-05-02 14:50:12,637 - INFO - Starting breast cancer prediction script at 2025-05-02 14:50:12.637386
+2025-05-02 14:50:12,646 - INFO - Dataset loaded: 569 samples, 30 features
+2025-05-02 14:50:12,646 - INFO - Memory usage: 150.54 MB
+2025-05-02 14:50:13,400 - INFO - Correlation heatmap saved to output/breast_cancer_heatmap_20250502_145012.png
+2025-05-02 14:50:13,400 - INFO - Memory usage: 159.59 MB
+2025-05-02 14:50:13,404 - INFO - Dataset split: 455 training, 114 test samples
+2025-05-02 14:50:13,404 - INFO - Memory usage: 159.70 MB
+2025-05-02 14:50:13,404 - INFO - Processing model: rf
+2025-05-02 14:50:13,405 - INFO - Initializing model: rf
+2025-05-02 14:50:13,405 - INFO - Starting GridSearchCV for rf
+2025-05-02 14:50:14,270 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 14:50:14,270 - INFO - Memory usage: 160.50 MB
+2025-05-02 14:50:14,285 - INFO - Test Set Metrics (rf):
+2025-05-02 14:50:14,285 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:14,285 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 1 70]]
+2025-05-02 14:50:14,289 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.975610  0.930233  0.952381   43.000000
+1              0.958904  0.985915  0.972222   71.000000
+accuracy       0.964912  0.964912  0.964912    0.964912
+macro avg      0.967257  0.958074  0.962302  114.000000
+weighted avg   0.965205  0.964912  0.964738  114.000000
+2025-05-02 14:50:14,475 - INFO - Confusion matrix saved to output/breast_cancer_rf_cm_20250502_145014.png
+2025-05-02 14:50:14,686 - INFO - Feature importance plot saved to output/breast_cancer_rf_importances_20250502_145014.png
+2025-05-02 14:50:14,686 - INFO - Memory usage: 163.98 MB
+2025-05-02 14:50:15,060 - INFO - Training Set Accuracy (rf): 0.99
+2025-05-02 14:50:15,060 - INFO - Test Set Accuracy (rf): 0.96
+2025-05-02 14:50:15,060 - INFO - Cross-validated Accuracy (rf): 0.95
+2025-05-02 14:50:15,060 - INFO - Memory usage: 164.30 MB
+2025-05-02 14:50:15,110 - INFO - Model saved to output/breast_cancer_rf_model_20250502_145015.pkl
+2025-05-02 14:50:15,110 - INFO - Memory usage: 164.50 MB
+2025-05-02 14:50:15,192 - INFO - Memory usage: 163.64 MB
+2025-05-02 14:50:15,192 - INFO - Processing model: gb
+2025-05-02 14:50:15,192 - INFO - Initializing model: gb
+2025-05-02 14:50:15,193 - INFO - Starting GridSearchCV for gb
+2025-05-02 14:50:18,941 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 3, 'regressor__n_estimators': 100}
+2025-05-02 14:50:18,942 - INFO - Memory usage: 164.14 MB
+2025-05-02 14:50:18,951 - INFO - Test Set Metrics (gb):
+2025-05-02 14:50:18,952 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:18,952 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 2 69]]
+2025-05-02 14:50:18,956 - INFO -   Classification Report:
+              precision    recall  f1-score    support
+0              0.952381  0.930233  0.941176   43.00000
+1              0.958333  0.971831  0.965035   71.00000
+accuracy       0.956140  0.956140  0.956140    0.95614
+macro avg      0.955357  0.951032  0.953106  114.00000
+weighted avg   0.956088  0.956140  0.956036  114.00000
+2025-05-02 14:50:19,101 - INFO - Confusion matrix saved to output/breast_cancer_gb_cm_20250502_145018.png
+2025-05-02 14:50:19,257 - INFO - Feature importance plot saved to output/breast_cancer_gb_importances_20250502_145019.png
+2025-05-02 14:50:19,258 - INFO - Memory usage: 164.21 MB
+2025-05-02 14:50:20,706 - INFO - Training Set Accuracy (gb): 1.00
+2025-05-02 14:50:20,706 - INFO - Test Set Accuracy (gb): 0.96
+2025-05-02 14:50:20,707 - INFO - Cross-validated Accuracy (gb): 0.95
+2025-05-02 14:50:20,707 - INFO - Memory usage: 164.28 MB
+2025-05-02 14:50:20,728 - INFO - Model saved to output/breast_cancer_gb_model_20250502_145020.pkl
+2025-05-02 14:50:20,728 - INFO - Memory usage: 164.62 MB
+2025-05-02 14:50:20,793 - INFO - Memory usage: 164.62 MB
+2025-05-02 14:50:20,794 - INFO - Processing model: knn
+2025-05-02 14:50:20,794 - INFO - Initializing model: knn
+2025-05-02 14:50:20,794 - INFO - Starting GridSearchCV for knn
+2025-05-02 14:50:20,891 - INFO - Best parameters for knn: {'regressor__n_neighbors': 3, 'regressor__weights': 'uniform'}
+2025-05-02 14:50:20,891 - INFO - Memory usage: 165.43 MB
+2025-05-02 14:50:20,907 - INFO - Test Set Metrics (knn):
+2025-05-02 14:50:20,907 - INFO -   Accuracy: 0.95
+2025-05-02 14:50:20,907 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 3 68]]
+2025-05-02 14:50:20,913 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.930233  0.930233  0.930233   43.000000
+1              0.957746  0.957746  0.957746   71.000000
+accuracy       0.947368  0.947368  0.947368    0.947368
+macro avg      0.943990  0.943990  0.943990  114.000000
+weighted avg   0.947368  0.947368  0.947368  114.000000
+2025-05-02 14:50:21,080 - INFO - Confusion matrix saved to output/breast_cancer_knn_cm_20250502_145020.png
+2025-05-02 14:50:21,080 - INFO - Memory usage: 167.10 MB
+2025-05-02 14:50:21,099 - INFO - Training Set Accuracy (knn): 0.98
+2025-05-02 14:50:21,099 - INFO - Test Set Accuracy (knn): 0.95
+2025-05-02 14:50:21,099 - INFO - Cross-validated Accuracy (knn): 0.96
+2025-05-02 14:50:21,100 - INFO - Memory usage: 168.05 MB
+2025-05-02 14:50:21,104 - INFO - Model saved to output/breast_cancer_knn_model_20250502_145021.pkl
+2025-05-02 14:50:21,104 - INFO - Memory usage: 168.05 MB
+2025-05-02 14:50:21,190 - INFO - Memory usage: 162.79 MB
+2025-05-02 14:50:21,190 - INFO - Processing model: svc
+2025-05-02 14:50:21,190 - INFO - Initializing model: svc
+2025-05-02 14:50:21,190 - INFO - Starting GridSearchCV for svc
+2025-05-02 14:50:21,268 - INFO - Best parameters for svc: {'regressor__C': 0.1, 'regressor__kernel': 'rbf'}
+2025-05-02 14:50:21,268 - INFO - Memory usage: 163.25 MB
+2025-05-02 14:50:21,283 - INFO - Test Set Metrics (svc):
+2025-05-02 14:50:21,283 - INFO -   Accuracy: 0.95
+2025-05-02 14:50:21,283 - INFO -   Confusion Matrix:
+[[39  4]
+ [ 2 69]]
+2025-05-02 14:50:21,286 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.951220  0.906977  0.928571   43.000000
+1              0.945205  0.971831  0.958333   71.000000
+accuracy       0.947368  0.947368  0.947368    0.947368
+macro avg      0.948212  0.939404  0.943452  114.000000
+weighted avg   0.947474  0.947368  0.947107  114.000000
+2025-05-02 14:50:21,465 - INFO - Confusion matrix saved to output/breast_cancer_svc_cm_20250502_145021.png
+2025-05-02 14:50:21,466 - INFO - Memory usage: 165.09 MB
+2025-05-02 14:50:21,510 - INFO - Training Set Accuracy (svc): 0.96
+2025-05-02 14:50:21,510 - INFO - Test Set Accuracy (svc): 0.95
+2025-05-02 14:50:21,510 - INFO - Cross-validated Accuracy (svc): 0.93
+2025-05-02 14:50:21,510 - INFO - Memory usage: 165.12 MB
+2025-05-02 14:50:21,514 - INFO - Model saved to output/breast_cancer_svc_model_20250502_145021.pkl
+2025-05-02 14:50:21,515 - INFO - Memory usage: 165.13 MB
+2025-05-02 14:50:21,581 - INFO - Memory usage: 163.96 MB
+2025-05-02 14:50:21,581 - INFO - Processing model: lr
+2025-05-02 14:50:21,581 - INFO - Initializing model: lr
+2025-05-02 14:50:21,582 - INFO - Starting GridSearchCV for lr
+2025-05-02 14:50:21,611 - INFO - Best parameters for lr: {'regressor__C': 0.1, 'regressor__solver': 'liblinear'}
+2025-05-02 14:50:21,611 - INFO - Memory usage: 164.08 MB
+2025-05-02 14:50:21,626 - INFO - Test Set Metrics (lr):
+2025-05-02 14:50:21,626 - INFO -   Accuracy: 0.99
+2025-05-02 14:50:21,626 - INFO -   Confusion Matrix:
+[[42  1]
+ [ 0 71]]
+2025-05-02 14:50:21,631 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.976744  0.988235   43.000000
+1              0.986111  1.000000  0.993007   71.000000
+accuracy       0.991228  0.991228  0.991228    0.991228
+macro avg      0.993056  0.988372  0.990621  114.000000
+weighted avg   0.991350  0.991228  0.991207  114.000000
+2025-05-02 14:50:21,840 - INFO - Confusion matrix saved to output/breast_cancer_lr_cm_20250502_145021.png
+2025-05-02 14:50:21,840 - INFO - Memory usage: 164.08 MB
+2025-05-02 14:50:21,862 - INFO - Training Set Accuracy (lr): 0.98
+2025-05-02 14:50:21,862 - INFO - Test Set Accuracy (lr): 0.99
+2025-05-02 14:50:21,862 - INFO - Cross-validated Accuracy (lr): 0.97
+2025-05-02 14:50:21,862 - INFO - Memory usage: 164.09 MB
+2025-05-02 14:50:21,867 - INFO - Model saved to output/breast_cancer_lr_model_20250502_145021.pkl
+2025-05-02 14:50:21,867 - INFO - Memory usage: 164.09 MB
+2025-05-02 14:50:21,933 - INFO - Memory usage: 164.09 MB
+2025-05-02 14:50:21,933 - INFO - Processing model: mlp
+2025-05-02 14:50:21,934 - INFO - Initializing model: mlp
+2025-05-02 14:50:21,934 - INFO - Starting GridSearchCV for mlp
+2025-05-02 14:50:24,280 - INFO - Best parameters for mlp: {'regressor__alpha': 0.05, 'regressor__hidden_layer_sizes': (20,)}
+2025-05-02 14:50:24,285 - INFO - Memory usage: 164.45 MB
+2025-05-02 14:50:24,293 - INFO - Test Set Metrics (mlp):
+2025-05-02 14:50:24,293 - INFO -   Accuracy: 0.98
+2025-05-02 14:50:24,293 - INFO -   Confusion Matrix:
+[[42  1]
+ [ 1 70]]
+2025-05-02 14:50:24,295 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.976744  0.976744  0.976744   43.000000
+1              0.985915  0.985915  0.985915   71.000000
+accuracy       0.982456  0.982456  0.982456    0.982456
+macro avg      0.981330  0.981330  0.981330  114.000000
+weighted avg   0.982456  0.982456  0.982456  114.000000
+2025-05-02 14:50:24,451 - INFO - Confusion matrix saved to output/breast_cancer_mlp_cm_20250502_145024.png
+2025-05-02 14:50:24,451 - INFO - Memory usage: 164.45 MB
+2025-05-02 14:50:25,461 - INFO - Training Set Accuracy (mlp): 0.99
+2025-05-02 14:50:25,462 - INFO - Test Set Accuracy (mlp): 0.98
+2025-05-02 14:50:25,462 - INFO - Cross-validated Accuracy (mlp): 0.97
+2025-05-02 14:50:25,462 - INFO - Memory usage: 164.66 MB
+2025-05-02 14:50:25,477 - INFO - Model saved to output/breast_cancer_mlp_model_20250502_145025.pkl
+2025-05-02 14:50:25,477 - INFO - Memory usage: 164.66 MB
+2025-05-02 14:50:25,546 - INFO - Memory usage: 164.66 MB
+2025-05-02 14:50:25,546 - INFO - Processing model: xgb
+2025-05-02 14:50:25,546 - INFO - Initializing model: xgb
+2025-05-02 14:50:25,546 - INFO - Starting GridSearchCV for xgb
+2025-05-02 14:50:26,118 - INFO - Best parameters for xgb: {'regressor__learning_rate': 0.1, 'regressor__max_depth': 3, 'regressor__n_estimators': 50}
+2025-05-02 14:50:26,118 - INFO - Memory usage: 164.43 MB
+2025-05-02 14:50:26,128 - INFO - Test Set Metrics (xgb):
+2025-05-02 14:50:26,128 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:26,129 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 2 69]]
+2025-05-02 14:50:26,131 - INFO -   Classification Report:
+              precision    recall  f1-score    support
+0              0.952381  0.930233  0.941176   43.00000
+1              0.958333  0.971831  0.965035   71.00000
+accuracy       0.956140  0.956140  0.956140    0.95614
+macro avg      0.955357  0.951032  0.953106  114.00000
+weighted avg   0.956088  0.956140  0.956036  114.00000
+2025-05-02 14:50:26,298 - INFO - Confusion matrix saved to output/breast_cancer_xgb_cm_20250502_145026.png
+2025-05-02 14:50:26,465 - INFO - Feature importance plot saved to output/breast_cancer_xgb_importances_20250502_145026.png
+2025-05-02 14:50:26,466 - INFO - Memory usage: 166.95 MB
+2025-05-02 14:50:26,732 - INFO - Training Set Accuracy (xgb): 1.00
+2025-05-02 14:50:26,732 - INFO - Test Set Accuracy (xgb): 0.96
+2025-05-02 14:50:26,732 - INFO - Cross-validated Accuracy (xgb): 0.96
+2025-05-02 14:50:26,732 - INFO - Memory usage: 164.81 MB
+2025-05-02 14:50:26,737 - INFO - Model saved to output/breast_cancer_xgb_model_20250502_145026.pkl
+2025-05-02 14:50:26,737 - INFO - Memory usage: 164.81 MB
+2025-05-02 14:50:26,800 - INFO - Memory usage: 164.81 MB
+2025-05-02 14:50:26,800 - INFO - Processing model: rf_pca
+2025-05-02 14:50:26,801 - INFO - Reduced to 15 components, explained variance ratio: 0.99
+2025-05-02 14:50:26,802 - INFO - Memory usage: 164.93 MB
+2025-05-02 14:50:26,802 - INFO - Initializing model: rf
+2025-05-02 14:50:26,802 - INFO - Starting GridSearchCV for rf
+2025-05-02 14:50:27,459 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 14:50:27,459 - INFO - Memory usage: 164.93 MB
+2025-05-02 14:50:27,470 - INFO - Test Set Metrics (rf_pca):
+2025-05-02 14:50:27,470 - INFO -   Accuracy: 0.96
+2025-05-02 14:50:27,470 - INFO -   Confusion Matrix:
+[[40  3]
+ [ 2 69]]
+2025-05-02 14:50:27,473 - INFO -   Classification Report:
+              precision    recall  f1-score    support
+0              0.952381  0.930233  0.941176   43.00000
+1              0.958333  0.971831  0.965035   71.00000
+accuracy       0.956140  0.956140  0.956140    0.95614
+macro avg      0.955357  0.951032  0.953106  114.00000
+weighted avg   0.956088  0.956140  0.956036  114.00000
+2025-05-02 14:50:27,621 - INFO - Confusion matrix saved to output/breast_cancer_rf_pca_cm_20250502_145027.png
+2025-05-02 14:50:27,622 - INFO - Memory usage: 168.05 MB
+2025-05-02 14:50:27,908 - INFO - Training Set Accuracy (rf_pca): 0.98
+2025-05-02 14:50:27,909 - INFO - Test Set Accuracy (rf_pca): 0.96
+2025-05-02 14:50:27,909 - INFO - Cross-validated Accuracy (rf_pca): 0.93
+2025-05-02 14:50:27,909 - INFO - Memory usage: 168.11 MB
+2025-05-02 14:50:27,956 - INFO - Model saved to output/breast_cancer_rf_pca_model_20250502_145027.pkl
+2025-05-02 14:50:27,957 - INFO - Memory usage: 166.98 MB
+2025-05-02 14:50:28,019 - INFO - Memory usage: 166.39 MB
+2025-05-02 14:50:28,022 - INFO - Metrics summary saved to output/breast_cancer_metrics.csv
+2025-05-02 14:50:28,022 - INFO - Script completed in 15.38 seconds

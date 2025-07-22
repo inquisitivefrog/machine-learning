@@ -1,0 +1,42 @@
+(py3ml) tim@Tims-MBP handwritten_digits % ./verify_handwriting.sh 
++ lsof -i :5000
+++ grep -v latest
+++ ls -t output/handwriting_rf_model_20250502_153455.pkl output/handwriting_rf_model_20250502_154146.pkl output/handwriting_rf_model_20250502_154147.pkl output/handwriting_rf_model_latest.pkl
+++ head -n 1
++ latest_model=output/handwriting_rf_model_20250502_154147.pkl
++ '[' -z output/handwriting_rf_model_20250502_154147.pkl ']'
++ cp output/handwriting_rf_model_20250502_154147.pkl output/handwriting_rf_model_latest.pkl
++ API_PID=5356
++ sleep 10
++ python3 handwriting.api.py
++ ps -p 5356
++ HOST=localhost
++ PORT=5000
++ curl -s -o /dev/null -w '%{http_code}' http://localhost:5000/health
++ grep -q 200
++ HEADER='Content-Type: application/json'
++ DATA='{"features": [0, 0, 5, 13, 9, 1, 0, 0, 0, 0, 13, 15, 10, 15, 5, 0, 0, 3, 15, 2, 0, 11, 8, 0, 0, 4, 12, 0, 0, 8, 8, 0, 0, 5, 8, 0, 0, 9, 8, 0, 0, 4, 11, 0, 1, 12, 7, 0, 0, 2, 14, 5, 10, 12, 0, 0, 0, 0, 6, 13, 10, 0, 0, 0]}'
++ for attempt in '{1..3}'
++ echo 'Attempt 1 to send prediction request'
+Attempt 1 to send prediction request
++ curl -X POST -H 'Content-Type: application/json' -d '{"features": [0, 0, 5, 13, 9, 1, 0, 0, 0, 0, 13, 15, 10, 15, 5, 0, 0, 3, 15, 2, 0, 11, 8, 0, 0, 4, 12, 0, 0, 8, 8, 0, 0, 5, 8, 0, 0, 9, 8, 0, 0, 4, 11, 0, 1, 12, 7, 0, 0, 2, 14, 5, 10, 12, 0, 0, 0, 0, 6, 13, 10, 0, 0, 0]}' http://localhost:5000/predict
+{
+  "prediction": 0,
+  "probabilities": [
+    0.9763,
+    0.0051,
+    0.0,
+    0.0,
+    0.0023,
+    0.004,
+    0.0045,
+    0.0011,
+    0.0032,
+    0.0034
+  ]
+}
++ break
++ kill -SIGTERM 5356
++ wait 5356
+(py3ml) tim@Tims-MBP handwritten_digits % 
+

@@ -1,0 +1,1077 @@
+
+tim@Tims-MBP ~ % cd Documents/workspace/python3/machine-learning/handwritten_digits
+tim@Tims-MBP diabetes % source ~/Desktop/Work/Python_Practice/py3ml/bin/activate
+
+(py3ml) tim@Tims-MBP handwritten_digits % pwd
+/Users/tim/Documents/workspace/python3/machine-learning/handwritten_digits
+
+(py3ml) tim@Tims-MBP output % rm *.png *.pkl *.log
+(py3ml) tim@Tims-MBP output % cd ..
+
+(py3ml) tim@Tims-MBP handwritten_digits % date; ./handwriting.py; date
+Fri May  2 13:39:13 PDT 2025
+2025-05-02 13:39:15,851 - INFO - Starting handwriting recognition script at 2025-05-02 13:39:15.851552
+2025-05-02 13:39:15,862 - INFO - Dataset loaded: 1797 samples, 64 features
+2025-05-02 13:39:15,862 - INFO - Memory usage: 152.16 MB
+2025-05-02 13:39:16,382 - INFO - Correlation heatmap saved to output/handwriting_heatmap_20250502_133915.png
+2025-05-02 13:39:16,383 - INFO - Memory usage: 162.75 MB
+2025-05-02 13:39:16,386 - INFO - Dataset split: 1437 training, 360 test samples
+2025-05-02 13:39:16,386 - INFO - Memory usage: 163.50 MB
+2025-05-02 13:39:16,386 - INFO - Processing model: rf
+2025-05-02 13:39:16,386 - INFO - Initializing model: rf
+2025-05-02 13:39:16,386 - INFO - Starting GridSearchCV for rf
+2025-05-02 13:39:17,021 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 13:39:17,021 - INFO - Memory usage: 165.30 MB
+2025-05-02 13:39:17,033 - INFO - Test Set Metrics (rf):
+2025-05-02 13:39:17,033 - INFO -   Accuracy: 0.94
+2025-05-02 13:39:17,033 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 26  1  0  0  0  0  0  0  1]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  1  0 31  0  1  0  0  1  0]
+ [ 0  0  0  0 44  0  0  2  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 1  0  0  0  0  0 34  0  0  0]
+ [ 0  0  0  0  0  0  0 34  0  0]
+ [ 0  2  0  0  0  1  0  0 26  1]
+ [ 0  0  0  0  0  1  0  3  0 36]]
+2025-05-02 13:39:17,038 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.969697  0.969697  0.969697   33.000000
+1              0.896552  0.928571  0.912281   28.000000
+2              0.970588  1.000000  0.985075   33.000000
+3              1.000000  0.911765  0.953846   34.000000
+4              0.977778  0.956522  0.967033   46.000000
+5              0.936170  0.936170  0.936170   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              0.871795  1.000000  0.931507   34.000000
+8              0.962963  0.866667  0.912281   30.000000
+9              0.900000  0.900000  0.900000   40.000000
+accuracy       0.944444  0.944444  0.944444    0.944444
+macro avg      0.945697  0.944082  0.943932  360.000000
+weighted avg   0.946224  0.944444  0.944459  360.000000
+2025-05-02 13:39:17,328 - INFO - Confusion matrix saved to output/handwriting_rf_cm_20250502_133917.png
+2025-05-02 13:39:17,482 - INFO - Feature importance plot saved to output/handwriting_rf_importances_20250502_133917.png
+2025-05-02 13:39:17,482 - INFO - Memory usage: 169.72 MB
+2025-05-02 13:39:17,865 - INFO - Training Set Accuracy (rf): 0.97
+2025-05-02 13:39:17,865 - INFO - Test Set Accuracy (rf): 0.94
+2025-05-02 13:39:17,866 - INFO - Cross-validated Accuracy (rf): 0.93
+2025-05-02 13:39:17,868 - INFO - Memory usage: 170.88 MB
+2025-05-02 13:39:17,924 - INFO - Model saved to output/handwriting_rf_model_20250502_133917.pkl
+2025-05-02 13:39:17,925 - INFO - Memory usage: 171.07 MB
+2025-05-02 13:39:17,991 - INFO - Memory usage: 167.63 MB
+2025-05-02 13:39:17,991 - INFO - Processing model: gb
+2025-05-02 13:39:17,991 - INFO - Initializing model: gb
+2025-05-02 13:39:17,991 - INFO - Starting GridSearchCV for gb
+2025-05-02 13:39:52,797 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 3, 'regressor__n_estimators': 100}
+2025-05-02 13:39:52,804 - INFO - Memory usage: 168.44 MB
+2025-05-02 13:39:52,827 - INFO - Test Set Metrics (gb):
+2025-05-02 13:39:52,827 - INFO -   Accuracy: 0.96
+2025-05-02 13:39:52,827 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 27  1  0  0  0  0  0  0  0]
+ [ 0  0 32  0  0  0  0  1  0  0]
+ [ 0  1  0 32  0  0  0  0  1  0]
+ [ 0  1  0  0 43  1  0  1  0  0]
+ [ 0  0  0  0  0 45  1  0  0  1]
+ [ 0  0  0  0  0  1 33  0  1  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  0  0  0  0  0  0  0 30  0]
+ [ 0  0  0  0  0  0  0  0  2 38]]
+2025-05-02 13:39:52,831 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.969697  0.984615   33.000000
+1              0.931034  0.964286  0.947368   28.000000
+2              0.969697  0.969697  0.969697   33.000000
+3              1.000000  0.941176  0.969697   34.000000
+4              0.977273  0.934783  0.955556   46.000000
+5              0.957447  0.957447  0.957447   47.000000
+6              0.970588  0.942857  0.956522   35.000000
+7              0.942857  0.970588  0.956522   34.000000
+8              0.882353  1.000000  0.937500   30.000000
+9              0.950000  0.950000  0.950000   40.000000
+accuracy       0.958333  0.958333  0.958333    0.958333
+macro avg      0.958125  0.960053  0.958492  360.000000
+weighted avg   0.959783  0.958333  0.958525  360.000000
+2025-05-02 13:39:53,309 - INFO - Confusion matrix saved to output/handwriting_gb_cm_20250502_133952.png
+2025-05-02 13:39:53,592 - INFO - Feature importance plot saved to output/handwriting_gb_importances_20250502_133953.png
+2025-05-02 13:39:53,592 - INFO - Memory usage: 170.17 MB
+2025-05-02 13:40:09,921 - INFO - Training Set Accuracy (gb): 1.00
+2025-05-02 13:40:09,921 - INFO - Test Set Accuracy (gb): 0.96
+2025-05-02 13:40:09,921 - INFO - Cross-validated Accuracy (gb): 0.94
+2025-05-02 13:40:09,921 - INFO - Memory usage: 170.85 MB
+2025-05-02 13:40:10,019 - INFO - Model saved to output/handwriting_gb_model_20250502_134009.pkl
+2025-05-02 13:40:10,020 - INFO - Memory usage: 179.98 MB
+2025-05-02 13:40:10,096 - INFO - Memory usage: 178.76 MB
+2025-05-02 13:40:10,096 - INFO - Processing model: knn
+2025-05-02 13:40:10,096 - INFO - Initializing model: knn
+2025-05-02 13:40:10,096 - INFO - Starting GridSearchCV for knn
+2025-05-02 13:40:10,199 - INFO - Best parameters for knn: {'regressor__n_neighbors': 3, 'regressor__weights': 'uniform'}
+2025-05-02 13:40:10,200 - INFO - Memory usage: 180.72 MB
+2025-05-02 13:40:10,216 - INFO - Test Set Metrics (knn):
+2025-05-02 13:40:10,216 - INFO -   Accuracy: 0.97
+2025-05-02 13:40:10,216 - INFO -   Confusion Matrix:
+[[33  0  0  0  0  0  0  0  0  0]
+ [ 0 28  0  0  0  0  0  0  0  0]
+ [ 0  1 32  0  0  0  0  0  0  0]
+ [ 0  0  1 33  0  0  0  0  0  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 45  1  0  0  1]
+ [ 0  0  0  0  0  0 35  0  0  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  1  1  0  0  0  0  0 28  0]
+ [ 0  0  0  1  1  1  0  0  1 36]]
+2025-05-02 13:40:10,223 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  1.000000  1.000000   33.000000
+1              0.933333  1.000000  0.965517   28.000000
+2              0.941176  0.969697  0.955224   33.000000
+3              0.970588  0.970588  0.970588   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.978261  0.957447  0.967742   47.000000
+6              0.972222  1.000000  0.985915   35.000000
+7              1.000000  0.970588  0.985075   34.000000
+8              0.965517  0.933333  0.949153   30.000000
+9              0.947368  0.900000  0.923077   40.000000
+accuracy       0.969444  0.969444  0.969444    0.969444
+macro avg      0.968719  0.970165  0.969154  360.000000
+weighted avg   0.969666  0.969444  0.969287  360.000000
+2025-05-02 13:40:10,622 - INFO - Confusion matrix saved to output/handwriting_knn_cm_20250502_134010.png
+2025-05-02 13:40:10,623 - INFO - Memory usage: 180.86 MB
+2025-05-02 13:40:10,683 - INFO - Training Set Accuracy (knn): 0.99
+2025-05-02 13:40:10,683 - INFO - Test Set Accuracy (knn): 0.97
+2025-05-02 13:40:10,683 - INFO - Cross-validated Accuracy (knn): 0.97
+2025-05-02 13:40:10,683 - INFO - Memory usage: 179.54 MB
+2025-05-02 13:40:10,695 - INFO - Model saved to output/handwriting_knn_model_20250502_134010.pkl
+2025-05-02 13:40:10,695 - INFO - Memory usage: 179.54 MB
+2025-05-02 13:40:10,817 - INFO - Memory usage: 175.26 MB
+2025-05-02 13:40:10,817 - INFO - Processing model: svc
+2025-05-02 13:40:10,817 - INFO - Initializing model: svc
+2025-05-02 13:40:10,818 - INFO - Starting GridSearchCV for svc
+2025-05-02 13:40:11,996 - INFO - Best parameters for svc: {'regressor__C': 0.1, 'regressor__kernel': 'rbf'}
+2025-05-02 13:40:11,997 - INFO - Memory usage: 174.55 MB
+2025-05-02 13:40:12,130 - INFO - Test Set Metrics (svc):
+2025-05-02 13:40:12,130 - INFO -   Accuracy: 0.95
+2025-05-02 13:40:12,130 - INFO -   Confusion Matrix:
+[[32  0  1  0  0  0  0  0  0  0]
+ [ 0 27  1  0  0  0  0  0  0  0]
+ [ 0  1 31  0  0  0  0  0  1  0]
+ [ 0  0  1 30  0  1  0  0  2  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 1  0  0  0  0  0 34  0  0  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  1  0  0  1  0  0  0 28  0]
+ [ 0  0  0  0  0  1  0  1  2 36]]
+2025-05-02 13:40:12,136 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.969697  0.969697  0.969697   33.000000
+1              0.931034  0.964286  0.947368   28.000000
+2              0.911765  0.939394  0.925373   33.000000
+3              1.000000  0.882353  0.937500   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.956522  0.936170  0.946237   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              0.970588  0.970588  0.970588   34.000000
+8              0.848485  0.933333  0.888889   30.000000
+9              0.923077  0.900000  0.911392   40.000000
+accuracy       0.947222  0.947222  0.947222    0.947222
+macro avg      0.946132  0.946725  0.945772  360.000000
+weighted avg   0.948646  0.947222  0.947332  360.000000
+2025-05-02 13:40:12,476 - INFO - Confusion matrix saved to output/handwriting_svc_cm_20250502_134012.png
+2025-05-02 13:40:12,476 - INFO - Memory usage: 176.46 MB
+2025-05-02 13:40:13,300 - INFO - Training Set Accuracy (svc): 0.96
+2025-05-02 13:40:13,301 - INFO - Test Set Accuracy (svc): 0.95
+2025-05-02 13:40:13,301 - INFO - Cross-validated Accuracy (svc): 0.93
+2025-05-02 13:40:13,301 - INFO - Memory usage: 176.48 MB
+2025-05-02 13:40:13,311 - INFO - Model saved to output/handwriting_svc_model_20250502_134013.pkl
+2025-05-02 13:40:13,311 - INFO - Memory usage: 177.05 MB
+2025-05-02 13:40:13,362 - INFO - Memory usage: 175.99 MB
+2025-05-02 13:40:13,363 - INFO - Processing model: lr
+2025-05-02 13:40:13,363 - INFO - Initializing model: lr
+2025-05-02 13:40:13,363 - INFO - Starting GridSearchCV for lr
+2025-05-02 13:40:13,879 - INFO - Best parameters for lr: {'regressor__C': 0.1, 'regressor__solver': 'liblinear'}
+2025-05-02 13:40:13,880 - INFO - Memory usage: 176.12 MB
+2025-05-02 13:40:13,887 - INFO - Test Set Metrics (lr):
+2025-05-02 13:40:13,887 - INFO -   Accuracy: 0.96
+2025-05-02 13:40:13,887 - INFO -   Confusion Matrix:
+[[33  0  0  0  0  0  0  0  0  0]
+ [ 0 27  1  0  0  0  0  0  0  0]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  0  0 33  0  0  0  0  1  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 0  0  0  0  1  0 34  0  0  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  2  0  0  0  1  0  0 27  0]
+ [ 0  0  0  0  0  1  0  0  2 37]]
+2025-05-02 13:40:13,890 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  1.000000  1.000000   33.000000
+1              0.931034  0.964286  0.947368   28.000000
+2              0.970588  1.000000  0.985075   33.000000
+3              1.000000  0.970588  0.985075   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.956522  0.936170  0.946237   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              1.000000  0.970588  0.985075   34.000000
+8              0.900000  0.900000  0.900000   30.000000
+9              0.925000  0.925000  0.925000   40.000000
+accuracy       0.963889  0.963889  0.963889    0.963889
+macro avg      0.963330  0.963806  0.963450  360.000000
+weighted avg   0.964100  0.963889  0.963882  360.000000
+2025-05-02 13:40:14,160 - INFO - Confusion matrix saved to output/handwriting_lr_cm_20250502_134013.png
+2025-05-02 13:40:14,160 - INFO - Memory usage: 176.13 MB
+2025-05-02 13:40:14,373 - INFO - Training Set Accuracy (lr): 0.97
+2025-05-02 13:40:14,373 - INFO - Test Set Accuracy (lr): 0.96
+2025-05-02 13:40:14,373 - INFO - Cross-validated Accuracy (lr): 0.95
+2025-05-02 13:40:14,373 - INFO - Memory usage: 177.03 MB
+2025-05-02 13:40:14,377 - INFO - Model saved to output/handwriting_lr_model_20250502_134014.pkl
+2025-05-02 13:40:14,377 - INFO - Memory usage: 177.03 MB
+2025-05-02 13:40:14,441 - INFO - Memory usage: 177.03 MB
+2025-05-02 13:40:14,441 - INFO - Processing model: mlp
+2025-05-02 13:40:14,441 - INFO - Initializing model: mlp
+2025-05-02 13:40:14,441 - INFO - Starting GridSearchCV for mlp
+2025-05-02 13:40:19,408 - INFO - Best parameters for mlp: {'regressor__alpha': 0.05, 'regressor__hidden_layer_sizes': (20,)}
+2025-05-02 13:40:19,409 - INFO - Memory usage: 177.21 MB
+2025-05-02 13:40:19,416 - INFO - Test Set Metrics (mlp):
+2025-05-02 13:40:19,416 - INFO -   Accuracy: 0.98
+2025-05-02 13:40:19,416 - INFO -   Confusion Matrix:
+[[32  0  0  0  0  0  0  1  0  0]
+ [ 0 28  0  0  0  0  0  0  0  0]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  0  0 33  0  1  0  0  0  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 0  0  0  0  0  1 34  0  0  0]
+ [ 0  0  0  0  0  1  0 33  0  0]
+ [ 0  0  0  0  0  0  0  0 30  0]
+ [ 0  0  0  0  0  0  0  0  1 39]]
+2025-05-02 13:40:19,419 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.969697  0.984615   33.000000
+1              1.000000  1.000000  1.000000   28.000000
+2              1.000000  1.000000  1.000000   33.000000
+3              1.000000  0.970588  0.985075   34.000000
+4              1.000000  1.000000  1.000000   46.000000
+5              0.936170  0.936170  0.936170   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              0.970588  0.970588  0.970588   34.000000
+8              0.967742  1.000000  0.983607   30.000000
+9              0.951220  0.975000  0.962963   40.000000
+accuracy       0.977778  0.977778  0.977778    0.977778
+macro avg      0.979715  0.979347  0.979445  360.000000
+weighted avg   0.978003  0.977778  0.977810  360.000000
+2025-05-02 13:40:19,676 - INFO - Confusion matrix saved to output/handwriting_mlp_cm_20250502_134019.png
+2025-05-02 13:40:19,677 - INFO - Memory usage: 176.32 MB
+2025-05-02 13:40:21,664 - INFO - Training Set Accuracy (mlp): 1.00
+2025-05-02 13:40:21,664 - INFO - Test Set Accuracy (mlp): 0.98
+2025-05-02 13:40:21,664 - INFO - Cross-validated Accuracy (mlp): 0.96
+2025-05-02 13:40:21,664 - INFO - Memory usage: 176.32 MB
+2025-05-02 13:40:21,682 - INFO - Model saved to output/handwriting_mlp_model_20250502_134021.pkl
+2025-05-02 13:40:21,682 - INFO - Memory usage: 176.32 MB
+2025-05-02 13:40:21,735 - INFO - Memory usage: 176.32 MB
+2025-05-02 13:40:21,735 - INFO - Processing model: xgb
+2025-05-02 13:40:21,735 - INFO - Initializing model: xgb
+2025-05-02 13:40:21,735 - INFO - Starting GridSearchCV for xgb
+2025-05-02 13:40:22,722 - INFO - Best parameters for xgb: {'regressor__learning_rate': 0.1, 'regressor__max_depth': 3, 'regressor__n_estimators': 50}
+2025-05-02 13:40:22,722 - INFO - Memory usage: 175.32 MB
+2025-05-02 13:40:22,732 - INFO - Test Set Metrics (xgb):
+2025-05-02 13:40:22,732 - INFO -   Accuracy: 0.96
+2025-05-02 13:40:22,732 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 26  1  0  0  0  0  0  0  1]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  1  0 32  0  0  0  0  1  0]
+ [ 0  2  0  0 44  0  0  0  0  0]
+ [ 0  0  0  0  0 45  1  0  0  1]
+ [ 0  0  0  0  0  1 33  0  1  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  1  0  0  0  0  0  0 29  0]
+ [ 0  0  0  0  0  0  0  1  2 37]]
+2025-05-02 13:40:22,736 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.969697  0.984615   33.000000
+1              0.866667  0.928571  0.896552   28.000000
+2              0.970588  1.000000  0.985075   33.000000
+3              1.000000  0.941176  0.969697   34.000000
+4              0.977778  0.956522  0.967033   46.000000
+5              0.978261  0.957447  0.967742   47.000000
+6              0.970588  0.942857  0.956522   35.000000
+7              0.970588  0.970588  0.970588   34.000000
+8              0.878788  0.966667  0.920635   30.000000
+9              0.925000  0.925000  0.925000   40.000000
+accuracy       0.955556  0.955556  0.955556    0.955556
+macro avg      0.953826  0.955853  0.954346  360.000000
+weighted avg   0.957184  0.955556  0.955938  360.000000
+2025-05-02 13:40:23,051 - INFO - Confusion matrix saved to output/handwriting_xgb_cm_20250502_134022.png
+2025-05-02 13:40:23,197 - INFO - Feature importance plot saved to output/handwriting_xgb_importances_20250502_134023.png
+2025-05-02 13:40:23,197 - INFO - Memory usage: 178.31 MB
+2025-05-02 13:40:23,990 - INFO - Training Set Accuracy (xgb): 1.00
+2025-05-02 13:40:23,990 - INFO - Test Set Accuracy (xgb): 0.96
+2025-05-02 13:40:23,990 - INFO - Cross-validated Accuracy (xgb): 0.94
+2025-05-02 13:40:23,990 - INFO - Memory usage: 177.69 MB
+2025-05-02 13:40:24,001 - INFO - Model saved to output/handwriting_xgb_model_20250502_134023.pkl
+2025-05-02 13:40:24,002 - INFO - Memory usage: 178.25 MB
+2025-05-02 13:40:24,078 - INFO - Memory usage: 177.98 MB
+2025-05-02 13:40:24,078 - INFO - Processing model: rf_pca
+2025-05-02 13:40:24,083 - INFO - Reduced to 30 components, explained variance ratio: 0.90
+2025-05-02 13:40:24,083 - INFO - Memory usage: 178.23 MB
+2025-05-02 13:40:24,083 - INFO - Initializing model: rf
+2025-05-02 13:40:24,083 - INFO - Starting GridSearchCV for rf
+2025-05-02 13:40:25,362 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 13:40:25,363 - INFO - Memory usage: 178.49 MB
+2025-05-02 13:40:25,374 - INFO - Test Set Metrics (rf_pca):
+2025-05-02 13:40:25,374 - INFO -   Accuracy: 0.93
+2025-05-02 13:40:25,374 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 27  0  0  0  1  0  0  0  0]
+ [ 0  1 30  0  0  0  0  0  2  0]
+ [ 0  0  1 30  0  0  1  0  1  1]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 1  0  0  0  0  0 34  0  0  0]
+ [ 0  0  1  0  0  1  0 32  0  0]
+ [ 0  2  3  1  0  0  0  0 24  0]
+ [ 0  0  0  0  0  3  0  1  1 35]]
+2025-05-02 13:40:25,377 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.969697  0.969697  0.969697   33.000000
+1              0.900000  0.964286  0.931034   28.000000
+2              0.857143  0.909091  0.882353   33.000000
+3              0.967742  0.882353  0.923077   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.897959  0.936170  0.916667   47.000000
+6              0.944444  0.971429  0.957746   35.000000
+7              0.969697  0.941176  0.955224   34.000000
+8              0.857143  0.800000  0.827586   30.000000
+9              0.921053  0.875000  0.897436   40.000000
+accuracy       0.927778  0.927778  0.927778    0.927778
+macro avg      0.926360  0.924920  0.925007  360.000000
+weighted avg   0.928322  0.927778  0.927455  360.000000
+2025-05-02 13:40:25,661 - INFO - Confusion matrix saved to output/handwriting_rf_pca_cm_20250502_134025.png
+2025-05-02 13:40:25,662 - INFO - Memory usage: 181.50 MB
+2025-05-02 13:40:26,219 - INFO - Training Set Accuracy (rf_pca): 0.95
+2025-05-02 13:40:26,219 - INFO - Test Set Accuracy (rf_pca): 0.93
+2025-05-02 13:40:26,219 - INFO - Cross-validated Accuracy (rf_pca): 0.90
+2025-05-02 13:40:26,220 - INFO - Memory usage: 181.64 MB
+2025-05-02 13:40:26,265 - INFO - Model saved to output/handwriting_rf_pca_model_20250502_134026.pkl
+2025-05-02 13:40:26,266 - INFO - Memory usage: 181.64 MB
+2025-05-02 13:40:26,332 - INFO - Memory usage: 179.60 MB
+2025-05-02 13:40:26,336 - INFO - Metrics summary saved to output/model_metrics.csv
+2025-05-02 13:40:26,337 - ERROR - Error predicting new image: name 'os' is not defined
+2025-05-02 13:40:26,337 - INFO - Script completed in 70.49 seconds
+Fri May  2 13:40:26 PDT 2025
+(py3ml) tim@Tims-MBP handwritten_digits % cd output                   
+(py3ml) tim@Tims-MBP output % rm -rf *.log *.png *.pkl
+(py3ml) tim@Tims-MBP output % ls
+model_metrics.csv
+(py3ml) tim@Tims-MBP output % rm model_metrics.csv 
+(py3ml) tim@Tims-MBP output % ls
+(py3ml) tim@Tims-MBP output % cd ..
+(py3ml) tim@Tims-MBP handwritten_digits % date; ./handwriting.py; date
+Fri May  2 13:52:54 PDT 2025
+2025-05-02 13:52:56,829 - INFO - Starting handwriting recognition script at 2025-05-02 13:52:56.829587
+2025-05-02 13:52:56,840 - INFO - Dataset loaded: 1797 samples, 64 features
+2025-05-02 13:52:56,840 - INFO - Memory usage: 152.06 MB
+2025-05-02 13:52:57,403 - INFO - Correlation heatmap saved to output/handwriting_heatmap_20250502_135256.png
+2025-05-02 13:52:57,404 - INFO - Memory usage: 162.72 MB
+2025-05-02 13:52:57,406 - INFO - Dataset split: 1437 training, 360 test samples
+2025-05-02 13:52:57,407 - INFO - Memory usage: 163.48 MB
+2025-05-02 13:52:57,407 - INFO - Processing model: rf
+2025-05-02 13:52:57,407 - INFO - Initializing model: rf
+2025-05-02 13:52:57,407 - INFO - Starting GridSearchCV for rf
+2025-05-02 13:52:58,095 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 13:52:58,096 - INFO - Memory usage: 165.25 MB
+2025-05-02 13:52:58,110 - INFO - Test Set Metrics (rf):
+2025-05-02 13:52:58,110 - INFO -   Accuracy: 0.94
+2025-05-02 13:52:58,110 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 26  1  0  0  0  0  0  0  1]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  1  0 31  0  1  0  0  1  0]
+ [ 0  0  0  0 44  0  0  2  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 1  0  0  0  0  0 34  0  0  0]
+ [ 0  0  0  0  0  0  0 34  0  0]
+ [ 0  2  0  0  0  1  0  0 26  1]
+ [ 0  0  0  0  0  1  0  3  0 36]]
+2025-05-02 13:52:58,115 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.969697  0.969697  0.969697   33.000000
+1              0.896552  0.928571  0.912281   28.000000
+2              0.970588  1.000000  0.985075   33.000000
+3              1.000000  0.911765  0.953846   34.000000
+4              0.977778  0.956522  0.967033   46.000000
+5              0.936170  0.936170  0.936170   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              0.871795  1.000000  0.931507   34.000000
+8              0.962963  0.866667  0.912281   30.000000
+9              0.900000  0.900000  0.900000   40.000000
+accuracy       0.944444  0.944444  0.944444    0.944444
+macro avg      0.945697  0.944082  0.943932  360.000000
+weighted avg   0.946224  0.944444  0.944459  360.000000
+2025-05-02 13:52:58,528 - INFO - Confusion matrix saved to output/handwriting_rf_cm_20250502_135258.png
+2025-05-02 13:52:58,814 - INFO - Feature importance plot saved to output/handwriting_rf_importances_20250502_135258.png
+2025-05-02 13:52:58,815 - INFO - Memory usage: 169.75 MB
+2025-05-02 13:52:59,288 - INFO - Training Set Accuracy (rf): 0.97
+2025-05-02 13:52:59,289 - INFO - Test Set Accuracy (rf): 0.94
+2025-05-02 13:52:59,289 - INFO - Cross-validated Accuracy (rf): 0.93
+2025-05-02 13:52:59,289 - INFO - Memory usage: 170.88 MB
+2025-05-02 13:52:59,347 - INFO - Model saved to output/handwriting_rf_model_20250502_135259.pkl
+2025-05-02 13:52:59,348 - INFO - Memory usage: 171.08 MB
+2025-05-02 13:52:59,446 - INFO - Memory usage: 167.64 MB
+2025-05-02 13:52:59,446 - INFO - Processing model: gb
+2025-05-02 13:52:59,446 - INFO - Initializing model: gb
+2025-05-02 13:52:59,447 - INFO - Starting GridSearchCV for gb
+2025-05-02 13:53:34,235 - INFO - Best parameters for gb: {'regressor__learning_rate': 0.05, 'regressor__max_depth': 3, 'regressor__n_estimators': 100}
+2025-05-02 13:53:34,235 - INFO - Memory usage: 168.51 MB
+2025-05-02 13:53:34,252 - INFO - Test Set Metrics (gb):
+2025-05-02 13:53:34,252 - INFO -   Accuracy: 0.96
+2025-05-02 13:53:34,252 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 27  1  0  0  0  0  0  0  0]
+ [ 0  0 32  0  0  0  0  1  0  0]
+ [ 0  1  0 32  0  0  0  0  1  0]
+ [ 0  1  0  0 43  1  0  1  0  0]
+ [ 0  0  0  0  0 45  1  0  0  1]
+ [ 0  0  0  0  0  1 33  0  1  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  0  0  0  0  0  0  0 30  0]
+ [ 0  0  0  0  0  0  0  0  2 38]]
+2025-05-02 13:53:34,256 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.969697  0.984615   33.000000
+1              0.931034  0.964286  0.947368   28.000000
+2              0.969697  0.969697  0.969697   33.000000
+3              1.000000  0.941176  0.969697   34.000000
+4              0.977273  0.934783  0.955556   46.000000
+5              0.957447  0.957447  0.957447   47.000000
+6              0.970588  0.942857  0.956522   35.000000
+7              0.942857  0.970588  0.956522   34.000000
+8              0.882353  1.000000  0.937500   30.000000
+9              0.950000  0.950000  0.950000   40.000000
+accuracy       0.958333  0.958333  0.958333    0.958333
+macro avg      0.958125  0.960053  0.958492  360.000000
+weighted avg   0.959783  0.958333  0.958525  360.000000
+2025-05-02 13:53:34,568 - INFO - Confusion matrix saved to output/handwriting_gb_cm_20250502_135334.png
+2025-05-02 13:53:34,731 - INFO - Feature importance plot saved to output/handwriting_gb_importances_20250502_135334.png
+2025-05-02 13:53:34,731 - INFO - Memory usage: 170.18 MB
+2025-05-02 13:53:49,335 - INFO - Training Set Accuracy (gb): 1.00
+2025-05-02 13:53:49,335 - INFO - Test Set Accuracy (gb): 0.96
+2025-05-02 13:53:49,335 - INFO - Cross-validated Accuracy (gb): 0.94
+2025-05-02 13:53:49,335 - INFO - Memory usage: 170.67 MB
+2025-05-02 13:53:49,398 - INFO - Model saved to output/handwriting_gb_model_20250502_135349.pkl
+2025-05-02 13:53:49,399 - INFO - Memory usage: 181.57 MB
+2025-05-02 13:53:49,459 - INFO - Memory usage: 180.35 MB
+2025-05-02 13:53:49,460 - INFO - Processing model: knn
+2025-05-02 13:53:49,460 - INFO - Initializing model: knn
+2025-05-02 13:53:49,460 - INFO - Starting GridSearchCV for knn
+2025-05-02 13:53:49,561 - INFO - Best parameters for knn: {'regressor__n_neighbors': 3, 'regressor__weights': 'uniform'}
+2025-05-02 13:53:49,562 - INFO - Memory usage: 182.31 MB
+2025-05-02 13:53:49,580 - INFO - Test Set Metrics (knn):
+2025-05-02 13:53:49,580 - INFO -   Accuracy: 0.97
+2025-05-02 13:53:49,581 - INFO -   Confusion Matrix:
+[[33  0  0  0  0  0  0  0  0  0]
+ [ 0 28  0  0  0  0  0  0  0  0]
+ [ 0  1 32  0  0  0  0  0  0  0]
+ [ 0  0  1 33  0  0  0  0  0  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 45  1  0  0  1]
+ [ 0  0  0  0  0  0 35  0  0  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  1  1  0  0  0  0  0 28  0]
+ [ 0  0  0  1  1  1  0  0  1 36]]
+2025-05-02 13:53:49,587 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  1.000000  1.000000   33.000000
+1              0.933333  1.000000  0.965517   28.000000
+2              0.941176  0.969697  0.955224   33.000000
+3              0.970588  0.970588  0.970588   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.978261  0.957447  0.967742   47.000000
+6              0.972222  1.000000  0.985915   35.000000
+7              1.000000  0.970588  0.985075   34.000000
+8              0.965517  0.933333  0.949153   30.000000
+9              0.947368  0.900000  0.923077   40.000000
+accuracy       0.969444  0.969444  0.969444    0.969444
+macro avg      0.968719  0.970165  0.969154  360.000000
+weighted avg   0.969666  0.969444  0.969287  360.000000
+2025-05-02 13:53:49,928 - INFO - Confusion matrix saved to output/handwriting_knn_cm_20250502_135349.png
+2025-05-02 13:53:49,928 - INFO - Memory usage: 182.45 MB
+2025-05-02 13:53:49,963 - INFO - Training Set Accuracy (knn): 0.99
+2025-05-02 13:53:49,963 - INFO - Test Set Accuracy (knn): 0.97
+2025-05-02 13:53:49,963 - INFO - Cross-validated Accuracy (knn): 0.97
+2025-05-02 13:53:49,963 - INFO - Memory usage: 181.13 MB
+2025-05-02 13:53:49,970 - INFO - Model saved to output/handwriting_knn_model_20250502_135349.pkl
+2025-05-02 13:53:49,970 - INFO - Memory usage: 181.13 MB
+2025-05-02 13:53:50,055 - INFO - Memory usage: 176.86 MB
+2025-05-02 13:53:50,055 - INFO - Processing model: svc
+2025-05-02 13:53:50,055 - INFO - Initializing model: svc
+2025-05-02 13:53:50,055 - INFO - Starting GridSearchCV for svc
+2025-05-02 13:53:50,876 - INFO - Best parameters for svc: {'regressor__C': 0.1, 'regressor__kernel': 'rbf'}
+2025-05-02 13:53:50,877 - INFO - Memory usage: 176.19 MB
+2025-05-02 13:53:50,979 - INFO - Test Set Metrics (svc):
+2025-05-02 13:53:50,979 - INFO -   Accuracy: 0.95
+2025-05-02 13:53:50,979 - INFO -   Confusion Matrix:
+[[32  0  1  0  0  0  0  0  0  0]
+ [ 0 27  1  0  0  0  0  0  0  0]
+ [ 0  1 31  0  0  0  0  0  1  0]
+ [ 0  0  1 30  0  1  0  0  2  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 1  0  0  0  0  0 34  0  0  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  1  0  0  1  0  0  0 28  0]
+ [ 0  0  0  0  0  1  0  1  2 36]]
+2025-05-02 13:53:50,982 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.969697  0.969697  0.969697   33.000000
+1              0.931034  0.964286  0.947368   28.000000
+2              0.911765  0.939394  0.925373   33.000000
+3              1.000000  0.882353  0.937500   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.956522  0.936170  0.946237   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              0.970588  0.970588  0.970588   34.000000
+8              0.848485  0.933333  0.888889   30.000000
+9              0.923077  0.900000  0.911392   40.000000
+accuracy       0.947222  0.947222  0.947222    0.947222
+macro avg      0.946132  0.946725  0.945772  360.000000
+weighted avg   0.948646  0.947222  0.947332  360.000000
+2025-05-02 13:53:51,268 - INFO - Confusion matrix saved to output/handwriting_svc_cm_20250502_135350.png
+2025-05-02 13:53:51,269 - INFO - Memory usage: 178.10 MB
+2025-05-02 13:53:52,105 - INFO - Training Set Accuracy (svc): 0.96
+2025-05-02 13:53:52,105 - INFO - Test Set Accuracy (svc): 0.95
+2025-05-02 13:53:52,105 - INFO - Cross-validated Accuracy (svc): 0.93
+2025-05-02 13:53:52,105 - INFO - Memory usage: 178.10 MB
+2025-05-02 13:53:52,116 - INFO - Model saved to output/handwriting_svc_model_20250502_135352.pkl
+2025-05-02 13:53:52,116 - INFO - Memory usage: 178.68 MB
+2025-05-02 13:53:52,174 - INFO - Memory usage: 177.62 MB
+2025-05-02 13:53:52,175 - INFO - Processing model: lr
+2025-05-02 13:53:52,175 - INFO - Initializing model: lr
+2025-05-02 13:53:52,175 - INFO - Starting GridSearchCV for lr
+2025-05-02 13:53:52,711 - INFO - Best parameters for lr: {'regressor__C': 0.1, 'regressor__solver': 'liblinear'}
+2025-05-02 13:53:52,711 - INFO - Memory usage: 177.75 MB
+2025-05-02 13:53:52,719 - INFO - Test Set Metrics (lr):
+2025-05-02 13:53:52,719 - INFO -   Accuracy: 0.96
+2025-05-02 13:53:52,719 - INFO -   Confusion Matrix:
+[[33  0  0  0  0  0  0  0  0  0]
+ [ 0 27  1  0  0  0  0  0  0  0]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  0  0 33  0  0  0  0  1  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 0  0  0  0  1  0 34  0  0  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  2  0  0  0  1  0  0 27  0]
+ [ 0  0  0  0  0  1  0  0  2 37]]
+2025-05-02 13:53:52,721 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  1.000000  1.000000   33.000000
+1              0.931034  0.964286  0.947368   28.000000
+2              0.970588  1.000000  0.985075   33.000000
+3              1.000000  0.970588  0.985075   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.956522  0.936170  0.946237   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              1.000000  0.970588  0.985075   34.000000
+8              0.900000  0.900000  0.900000   30.000000
+9              0.925000  0.925000  0.925000   40.000000
+accuracy       0.963889  0.963889  0.963889    0.963889
+macro avg      0.963330  0.963806  0.963450  360.000000
+weighted avg   0.964100  0.963889  0.963882  360.000000
+2025-05-02 13:53:53,017 - INFO - Confusion matrix saved to output/handwriting_lr_cm_20250502_135352.png
+2025-05-02 13:53:53,017 - INFO - Memory usage: 177.75 MB
+2025-05-02 13:53:53,251 - INFO - Training Set Accuracy (lr): 0.97
+2025-05-02 13:53:53,251 - INFO - Test Set Accuracy (lr): 0.96
+2025-05-02 13:53:53,251 - INFO - Cross-validated Accuracy (lr): 0.95
+2025-05-02 13:53:53,251 - INFO - Memory usage: 178.64 MB
+2025-05-02 13:53:53,255 - INFO - Model saved to output/handwriting_lr_model_20250502_135353.pkl
+2025-05-02 13:53:53,255 - INFO - Memory usage: 178.64 MB
+2025-05-02 13:53:53,309 - INFO - Memory usage: 178.64 MB
+2025-05-02 13:53:53,309 - INFO - Processing model: mlp
+2025-05-02 13:53:53,309 - INFO - Initializing model: mlp
+2025-05-02 13:53:53,310 - INFO - Starting GridSearchCV for mlp
+2025-05-02 13:53:58,347 - INFO - Best parameters for mlp: {'regressor__alpha': 0.05, 'regressor__hidden_layer_sizes': (20,)}
+2025-05-02 13:53:58,348 - INFO - Memory usage: 178.84 MB
+2025-05-02 13:53:58,363 - INFO - Test Set Metrics (mlp):
+2025-05-02 13:53:58,363 - INFO -   Accuracy: 0.98
+2025-05-02 13:53:58,363 - INFO -   Confusion Matrix:
+[[32  0  0  0  0  0  0  1  0  0]
+ [ 0 28  0  0  0  0  0  0  0  0]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  0  0 33  0  1  0  0  0  0]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 0  0  0  0  0  1 34  0  0  0]
+ [ 0  0  0  0  0  1  0 33  0  0]
+ [ 0  0  0  0  0  0  0  0 30  0]
+ [ 0  0  0  0  0  0  0  0  1 39]]
+2025-05-02 13:53:58,367 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.969697  0.984615   33.000000
+1              1.000000  1.000000  1.000000   28.000000
+2              1.000000  1.000000  1.000000   33.000000
+3              1.000000  0.970588  0.985075   34.000000
+4              1.000000  1.000000  1.000000   46.000000
+5              0.936170  0.936170  0.936170   47.000000
+6              0.971429  0.971429  0.971429   35.000000
+7              0.970588  0.970588  0.970588   34.000000
+8              0.967742  1.000000  0.983607   30.000000
+9              0.951220  0.975000  0.962963   40.000000
+accuracy       0.977778  0.977778  0.977778    0.977778
+macro avg      0.979715  0.979347  0.979445  360.000000
+weighted avg   0.978003  0.977778  0.977810  360.000000
+2025-05-02 13:53:58,638 - INFO - Confusion matrix saved to output/handwriting_mlp_cm_20250502_135358.png
+2025-05-02 13:53:58,638 - INFO - Memory usage: 178.93 MB
+2025-05-02 13:54:00,687 - INFO - Training Set Accuracy (mlp): 1.00
+2025-05-02 13:54:00,687 - INFO - Test Set Accuracy (mlp): 0.98
+2025-05-02 13:54:00,687 - INFO - Cross-validated Accuracy (mlp): 0.96
+2025-05-02 13:54:00,687 - INFO - Memory usage: 178.96 MB
+2025-05-02 13:54:00,700 - INFO - Model saved to output/handwriting_mlp_model_20250502_135400.pkl
+2025-05-02 13:54:00,700 - INFO - Memory usage: 178.96 MB
+2025-05-02 13:54:00,761 - INFO - Memory usage: 178.96 MB
+2025-05-02 13:54:00,761 - INFO - Processing model: xgb
+2025-05-02 13:54:00,761 - INFO - Initializing model: xgb
+2025-05-02 13:54:00,761 - INFO - Starting GridSearchCV for xgb
+2025-05-02 13:54:04,350 - INFO - Best parameters for xgb: {'regressor__learning_rate': 0.1, 'regressor__max_depth': 3, 'regressor__n_estimators': 50}
+2025-05-02 13:54:04,351 - INFO - Memory usage: 177.62 MB
+2025-05-02 13:54:04,362 - INFO - Test Set Metrics (xgb):
+2025-05-02 13:54:04,362 - INFO -   Accuracy: 0.96
+2025-05-02 13:54:04,362 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 26  1  0  0  0  0  0  0  1]
+ [ 0  0 33  0  0  0  0  0  0  0]
+ [ 0  1  0 32  0  0  0  0  1  0]
+ [ 0  2  0  0 44  0  0  0  0  0]
+ [ 0  0  0  0  0 45  1  0  0  1]
+ [ 0  0  0  0  0  1 33  0  1  0]
+ [ 0  0  0  0  0  0  0 33  0  1]
+ [ 0  1  0  0  0  0  0  0 29  0]
+ [ 0  0  0  0  0  0  0  1  2 37]]
+2025-05-02 13:54:04,365 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              1.000000  0.969697  0.984615   33.000000
+1              0.866667  0.928571  0.896552   28.000000
+2              0.970588  1.000000  0.985075   33.000000
+3              1.000000  0.941176  0.969697   34.000000
+4              0.977778  0.956522  0.967033   46.000000
+5              0.978261  0.957447  0.967742   47.000000
+6              0.970588  0.942857  0.956522   35.000000
+7              0.970588  0.970588  0.970588   34.000000
+8              0.878788  0.966667  0.920635   30.000000
+9              0.925000  0.925000  0.925000   40.000000
+accuracy       0.955556  0.955556  0.955556    0.955556
+macro avg      0.953826  0.955853  0.954346  360.000000
+weighted avg   0.957184  0.955556  0.955938  360.000000
+2025-05-02 13:54:04,696 - INFO - Confusion matrix saved to output/handwriting_xgb_cm_20250502_135404.png
+2025-05-02 13:54:04,852 - INFO - Feature importance plot saved to output/handwriting_xgb_importances_20250502_135404.png
+2025-05-02 13:54:04,852 - INFO - Memory usage: 180.61 MB
+2025-05-02 13:54:06,509 - INFO - Training Set Accuracy (xgb): 1.00
+2025-05-02 13:54:06,509 - INFO - Test Set Accuracy (xgb): 0.96
+2025-05-02 13:54:06,509 - INFO - Cross-validated Accuracy (xgb): 0.94
+2025-05-02 13:54:06,509 - INFO - Memory usage: 180.77 MB
+2025-05-02 13:54:06,523 - INFO - Model saved to output/handwriting_xgb_model_20250502_135406.pkl
+2025-05-02 13:54:06,523 - INFO - Memory usage: 181.33 MB
+2025-05-02 13:54:06,591 - INFO - Memory usage: 181.05 MB
+2025-05-02 13:54:06,591 - INFO - Processing model: rf_pca
+2025-05-02 13:54:06,594 - INFO - Reduced to 30 components, explained variance ratio: 0.90
+2025-05-02 13:54:06,594 - INFO - Memory usage: 181.30 MB
+2025-05-02 13:54:06,594 - INFO - Initializing model: rf
+2025-05-02 13:54:06,594 - INFO - Starting GridSearchCV for rf
+2025-05-02 13:54:07,866 - INFO - Best parameters for rf: {'regressor__max_depth': 5, 'regressor__n_estimators': 50}
+2025-05-02 13:54:07,866 - INFO - Memory usage: 181.30 MB
+2025-05-02 13:54:07,878 - INFO - Test Set Metrics (rf_pca):
+2025-05-02 13:54:07,878 - INFO -   Accuracy: 0.93
+2025-05-02 13:54:07,878 - INFO -   Confusion Matrix:
+[[32  0  0  0  1  0  0  0  0  0]
+ [ 0 27  0  0  0  1  0  0  0  0]
+ [ 0  1 30  0  0  0  0  0  2  0]
+ [ 0  0  1 30  0  0  1  0  1  1]
+ [ 0  0  0  0 46  0  0  0  0  0]
+ [ 0  0  0  0  0 44  1  0  0  2]
+ [ 1  0  0  0  0  0 34  0  0  0]
+ [ 0  0  1  0  0  1  0 32  0  0]
+ [ 0  2  3  1  0  0  0  0 24  0]
+ [ 0  0  0  0  0  3  0  1  1 35]]
+2025-05-02 13:54:07,881 - INFO -   Classification Report:
+              precision    recall  f1-score     support
+0              0.969697  0.969697  0.969697   33.000000
+1              0.900000  0.964286  0.931034   28.000000
+2              0.857143  0.909091  0.882353   33.000000
+3              0.967742  0.882353  0.923077   34.000000
+4              0.978723  1.000000  0.989247   46.000000
+5              0.897959  0.936170  0.916667   47.000000
+6              0.944444  0.971429  0.957746   35.000000
+7              0.969697  0.941176  0.955224   34.000000
+8              0.857143  0.800000  0.827586   30.000000
+9              0.921053  0.875000  0.897436   40.000000
+accuracy       0.927778  0.927778  0.927778    0.927778
+macro avg      0.926360  0.924920  0.925007  360.000000
+weighted avg   0.928322  0.927778  0.927455  360.000000
+2025-05-02 13:54:08,146 - INFO - Confusion matrix saved to output/handwriting_rf_pca_cm_20250502_135407.png
+2025-05-02 13:54:08,146 - INFO - Memory usage: 184.31 MB
+2025-05-02 13:54:08,698 - INFO - Training Set Accuracy (rf_pca): 0.95
+2025-05-02 13:54:08,699 - INFO - Test Set Accuracy (rf_pca): 0.93
+2025-05-02 13:54:08,699 - INFO - Cross-validated Accuracy (rf_pca): 0.90
+2025-05-02 13:54:08,699 - INFO - Memory usage: 184.35 MB
+2025-05-02 13:54:08,738 - INFO - Model saved to output/handwriting_rf_pca_model_20250502_135408.pkl
+2025-05-02 13:54:08,739 - INFO - Memory usage: 184.35 MB
+2025-05-02 13:54:08,797 - INFO - Memory usage: 182.36 MB
+2025-05-02 13:54:08,802 - INFO - Metrics summary saved to output/model_metrics.csv
+2025-05-02 13:54:08,820 - INFO - Predicted digit: 0
+2025-05-02 13:54:08,821 - INFO - Predicted digit for new image: 0
+2025-05-02 13:54:08,821 - INFO - Script completed in 71.99 seconds
+
+(py3ml) tim@Tims-MBP handwritten_digits % cat handwriting.py 
+#!/usr/bin/env python3
+# Handwritten Digits: 1797 data point handwritten digits collection from scikit-learn module
+# introduces unsupervised learning and k-means clustering metrics
+# https://scikit-learn.org/stable/datasets/toy_dataset.html#optical-recognition-of-handwritten-digits-dataset
+# https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html#sklearn.datasets.load_digits
+
+import gc
+import glob
+import logging
+import time
+from datetime import datetime
+import joblib
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import seaborn as sns
+import psutil
+import os  # Added to fix predict_new_image error
+from sklearn.datasets import load_digits
+from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.model_selection import cross_val_score, train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from xgboost import XGBClassifier
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("output/handwriting.log"),
+        logging.StreamHandler()
+    ]
+)
+
+def log_memory_usage():
+    """Log current memory usage."""
+    process = psutil.Process()
+    mem_info = process.memory_info()
+    logging.info("Memory usage: %.2f MB", mem_info.rss / 1024 / 1024)
+
+def save_plot(fig, save_path, title):
+    """Save a plot and ensure figure is closed."""
+    try:
+        fig.savefig(save_path, dpi=80, bbox_inches="tight")
+        logging.info("%s saved to %s", title, save_path)
+        plt.close(fig)
+    except Exception as e:
+        logging.error(f"Error saving %s: %s", title, e)
+
+def load_dataset():
+    """Load the digits dataset."""
+    try:
+        digits = load_digits()
+        X, y = digits.data, digits.target
+        logging.info("Dataset loaded: %d samples, %d features", X.shape[0], X.shape[1])
+        log_memory_usage()
+        return X, y, digits
+    except Exception as e:
+        logging.error(f"Error loading dataset: %s", e)
+        return None, None, None
+
+def split_dataset(X, y, test_size=0.2, random_state=42):
+    """Split and scale the dataset."""
+    try:
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+        logging.info("Dataset split: %d training, %d test samples", len(X_train), len(X_test))
+        log_memory_usage()
+        return X_train, X_test, y_train, y_test, scaler
+    except Exception as e:
+        logging.error(f"Error splitting dataset: %s", e)
+        return None, None, None, None, None
+
+def reduce_dimensions(X_train, X_test, n_components=30):
+    """Apply PCA for dimensionality reduction."""
+    try:
+        pca = PCA(n_components=n_components)
+        X_train_pca = pca.fit_transform(X_train)
+        X_test_pca = pca.transform(X_test)
+        logging.info("Reduced to %d components, explained variance ratio: %.2f", n_components, sum(pca.explained_variance_ratio_))
+        log_memory_usage()
+        return X_train_pca, X_test_pca, pca
+    except Exception as e:
+        logging.error(f"Error reducing dimensions: %s", e)
+        return None, None, None
+
+def train_model(X_train, y_train, model_type="rf", cv=5):
+    """Train a model with hyperparameter tuning."""
+    try:
+        logging.info("Initializing model: %s", model_type)
+        if model_type == "rf":
+            param_grid = {
+                'regressor__n_estimators': [50],
+                'regressor__max_depth': [5]
+            }
+            model = RandomForestClassifier(random_state=42)
+        elif model_type == "gb":
+            param_grid = {
+                'regressor__n_estimators': [100],
+                'regressor__learning_rate': [0.05],
+                'regressor__max_depth': [3]
+            }
+            model = GradientBoostingClassifier(random_state=42)
+        elif model_type == "knn":
+            param_grid = {
+                'regressor__n_neighbors': [3],
+                'regressor__weights': ['uniform']
+            }
+            model = KNeighborsClassifier()
+        elif model_type == "svc":
+            param_grid = {
+                'regressor__C': [0.1],
+                'regressor__kernel': ['rbf']
+            }
+            model = SVC(random_state=42)
+        elif model_type == "lr":
+            param_grid = {
+                'regressor__C': [0.1],
+                'regressor__solver': ['liblinear']
+            }
+            model = LogisticRegression(max_iter=300, random_state=42)
+        elif model_type == "mlp":
+            param_grid = {
+                'regressor__hidden_layer_sizes': [(20,)],
+                'regressor__alpha': [0.05]
+            }
+            model = MLPClassifier(max_iter=1000, random_state=42)
+        elif model_type == "xgb":
+            param_grid = {
+                'regressor__n_estimators': [50],
+                'regressor__max_depth': [3],
+                'regressor__learning_rate': [0.1]
+            }
+            model = XGBClassifier(random_state=42, eval_metric='mlogloss')
+        else:
+            logging.error("Unsupported model type: %s", model_type)
+            return None
+        pipeline = Pipeline([('regressor', model)])
+        grid_search = GridSearchCV(pipeline, param_grid, cv=cv, scoring='accuracy', n_jobs=1)
+        logging.info("Starting GridSearchCV for %s", model_type)
+        grid_search.fit(X_train, y_train)
+        logging.info("Best parameters for %s: %s", model_type, grid_search.best_params_)
+        log_memory_usage()
+        return grid_search.best_estimator_
+    except Exception as e:
+        logging.error(f"Error training %s model: %s", model_type, e)
+        return None
+
+def evaluate_model(model, X_test, y_test, digits, debug=False, model_type="rf"):
+    """Evaluate model performance."""
+    try:
+        predictions = model.predict(X_test)
+        accuracy = accuracy_score(y_test, predictions)
+        cm = confusion_matrix(y_test, predictions)
+        report = classification_report(y_test, predictions, output_dict=True, zero_division=0)
+        logging.info("Test Set Metrics (%s):", model_type)
+        logging.info("  Accuracy: %.2f", accuracy)
+        logging.info("  Confusion Matrix:\n%s", cm)
+        logging.info("  Classification Report:\n%s", pd.DataFrame(report).transpose().to_string())
+        if debug:
+            save_path = f"output/handwriting_{model_type}_cm_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            fig = plt.figure(figsize=(8, 6))
+            sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=digits.target_names, yticklabels=digits.target_names)
+            plt.title(f"{model_type.upper()} Confusion Matrix")
+            plt.xlabel("Predicted")
+            plt.ylabel("Actual")
+            save_plot(fig, save_path, "Confusion matrix")
+
+            if model_type in ["rf", "gb", "xgb"]:
+                importances = model.named_steps['regressor'].feature_importances_
+                importance_save_path = f"output/handwriting_{model_type}_importances_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+                fig = plt.figure(figsize=(10, 6))
+                top_indices = np.argsort(importances)[-10:]
+                top_importances = importances[top_indices]
+                top_names = [f"pixel_{i}" for i in top_indices]
+                sns.barplot(x=top_importances, y=top_names)
+                plt.title(f"{model_type.upper()} Feature Importances")
+                save_plot(fig, importance_save_path, "Feature importance plot")
+        log_memory_usage()
+        return {"accuracy": accuracy, "cm": cm, "report": report}
+    except Exception as e:
+        logging.error(f"Error evaluating %s model: %s", model_type, e)
+        return None
+
+def measure_model(model, X_train, y_train, X_test, y_test, model_type="rf"):
+    """Measure model performance with cross-validation."""
+    try:
+        train_pred = model.predict(X_train)
+        train_accuracy = accuracy_score(y_train, train_pred)
+        test_pred = model.predict(X_test)
+        test_accuracy = accuracy_score(y_test, test_pred)
+        cv_scores = cross_val_score(model, X_train, y_train, cv=3, scoring='accuracy')
+        logging.info("Training Set Accuracy (%s): %.2f", model_type, train_accuracy)
+        logging.info("Test Set Accuracy (%s): %.2f", model_type, test_accuracy)
+        logging.info("Cross-validated Accuracy (%s): %.2f", model_type, cv_scores.mean())
+        log_memory_usage()
+    except Exception as e:
+        logging.error(f"Error measuring %s model: %s", model_type, e)
+
+def save_model(model, scaler, model_type="rf"):
+    """Save model and scaler."""
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"output/handwriting_{model_type}_model_{timestamp}.pkl"
+        joblib.dump(model, filename)
+        joblib.dump(scaler, f"output/scaler_{timestamp}.pkl")
+        joblib.dump(model, f"output/handwriting_{model_type}_model_latest.pkl")
+        joblib.dump(scaler, "output/scaler.pkl")
+        logging.info("Model saved to %s", filename)
+        log_memory_usage()
+    except Exception as e:
+        logging.error(f"Error saving %s model: %s", model_type, e)
+
+def predict_new_image(model_path, image_data, scaler):
+    """Predict digit for new image."""
+    try:
+        model = joblib.load(model_path)
+        image_scaled = scaler.transform(image_data)
+        prediction = model.predict(image_scaled)
+        logging.info("Predicted digit: %d", prediction[0])
+        return prediction
+    except Exception as e:
+        logging.error(f"Error predicting: %s", e)
+        return None
+
+def debug(X, y, digits, debug_mode=False):
+    """Log dataset details and generate correlation heatmap."""
+    try:
+        feature_names = [f"pixel_{i}" for i in range(X.shape[1])]
+        logging.debug("Features: %s", feature_names)
+        logging.debug("Target: Digit (0-9)")
+        logging.debug("Sample Size: %d", X.shape[0])
+        logging.debug("Features: %d", X.shape[1])
+        df = pd.DataFrame(X, columns=feature_names)
+        logging.debug("Sample:\n%s", df.iloc[0:2])
+        logging.debug("Summary Statistics:\n%s", df.describe())
+        logging.debug("Target Distribution:\n%s", pd.Series(y).value_counts().to_string())
+        if debug_mode:
+            save_path = f"output/handwriting_heatmap_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+            fig = plt.figure(figsize=(10, 8))
+            sns.heatmap(df.corr(), cmap='coolwarm', annot=False)
+            plt.title("Feature Correlation Heatmap")
+            save_plot(fig, save_path, "Correlation heatmap")
+        log_memory_usage()
+    except Exception as e:
+        logging.error(f"Error debugging dataset: %s", e)
+
+def main():
+    """Main function to train and evaluate models."""
+    start_time = time.time()
+    logging.info("Starting handwriting recognition script at %s", datetime.now())
+    
+    # Load and preprocess data
+    X, y, digits = load_dataset()
+    if X is None or y is None:
+        logging.error("Failed to load dataset")
+        return
+    debug(X, y, digits, debug_mode=True)
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    if X_train is None:
+        logging.error("Failed to split dataset")
+        return
+
+    # Train and evaluate models
+    model_types = ["rf", "gb", "knn", "svc", "lr", "mlp", "xgb", "rf_pca"]
+    metrics_summary = []
+    for model_type in model_types:
+        logging.info("Processing model: %s", model_type)
+        try:
+            if model_type == "rf_pca":
+                X_train_pca, X_test_pca, pca = reduce_dimensions(X_train, X_test, n_components=30)
+                if X_train_pca is None:
+                    logging.error("Failed to reduce dimensions for rf_pca")
+                    continue
+                model = train_model(X_train_pca, y_train, model_type="rf")
+                if model is None:
+                    logging.error("Failed to train rf_pca model")
+                    continue
+                metrics = evaluate_model(model, X_test_pca, y_test, digits, debug=True, model_type="rf_pca")
+                measure_model(model, X_train_pca, y_train, X_test_pca, y_test, model_type="rf_pca")
+                save_model(model, scaler, model_type="rf_pca")
+                if metrics:
+                    metrics_summary.append({
+                        "model": model_type,
+                        "accuracy": metrics["accuracy"],
+                        "precision": metrics["report"]["weighted avg"]["precision"],
+                        "recall": metrics["report"]["weighted avg"]["recall"],
+                        "f1-score": metrics["report"]["weighted avg"]["f1-score"]
+                    })
+                del X_train_pca, X_test_pca, pca, metrics
+            else:
+                model = train_model(X_train, y_train, model_type=model_type)
+                if model is None:
+                    logging.error("Failed to train %s model", model_type)
+                    continue
+                metrics = evaluate_model(model, X_test, y_test, digits, debug=True, model_type=model_type)
+                measure_model(model, X_train, y_train, X_test, y_test, model_type=model_type)
+                save_model(model, scaler, model_type=model_type)
+                if metrics:
+                    metrics_summary.append({
+                        "model": model_type,
+                        "accuracy": metrics["accuracy"],
+                        "precision": metrics["report"]["weighted avg"]["precision"],
+                        "recall": metrics["report"]["weighted avg"]["recall"],
+                        "f1-score": metrics["report"]["weighted avg"]["f1-score"]
+                    })
+                del metrics
+            del model
+            gc.collect()
+            log_memory_usage()
+        except Exception as e:
+            logging.error(f"Error processing %s model: %s", model_type, e)
+            continue
+
+    # Save metrics summary to CSV
+    if metrics_summary:
+        pd.DataFrame(metrics_summary).to_csv("output/model_metrics.csv", index=False)
+        logging.info("Metrics summary saved to output/model_metrics.csv")
+
+    # Predict new image
+    try:
+        model_files = glob.glob("output/handwriting_rf_model_*.pkl")
+        if not model_files:
+            logging.warning("No RandomForest model found for prediction")
+        else:
+            model_path = max(model_files, key=os.path.getctime)
+            image_data = X[:1]
+            prediction = predict_new_image(model_path, image_data, scaler)
+            if prediction is not None:
+                logging.info("Predicted digit for new image: %d", prediction[0])
+    except Exception as e:
+        logging.error(f"Error predicting new image: %s", e)
+
+    logging.info("Script completed in %.2f seconds", time.time() - start_time)
+
+if __name__ == "__main__":
+    main()
+(py3ml) tim@Tims-MBP handwritten_digits % 
+

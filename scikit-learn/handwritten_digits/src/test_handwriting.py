@@ -1,0 +1,414 @@
+#!/usr/bin/env python3
+
+import glob
+import joblib
+import logging
+import matplotlib
+matplotlib.use('Agg')
+import numpy as np
+import os
+import pytest
+from unittest.mock import patch
+from sklearn.pipeline import Pipeline
+from handwriting import (
+    load_dataset,
+    split_dataset,
+    reduce_dimensions,
+    train_model,
+    evaluate_model,
+    measure_model,
+    save_model,
+    predict_new_image,
+    debug
+)
+
+os.makedirs("output", exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("output/test_handwriting.log"),
+        logging.StreamHandler()
+    ]
+)
+
+@pytest.fixture
+def digits_data():
+    """Load digits dataset."""
+    X, y, digits = load_dataset()
+    return X, y, digits
+
+def test_load_dataset(digits_data):
+    """Verify dataset loads correctly."""
+    X, y, digits = digits_data
+    assert X.shape == (1797, 64)
+    assert y.shape == (1797,)
+    assert len(digits.target_names) == 10
+
+def test_split_dataset(digits_data):
+    """Verify dataset splits and scales."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    assert X_train.shape[0] + X_test.shape[0] == 1797
+    assert y_train.shape[0] == X_train.shape[0]
+    assert y_test.shape[0] == X_test.shape[0]
+    assert X_train.shape[1] == 64
+    assert scaler is not None
+
+def test_reduce_dimensions(digits_data):
+    """Verify PCA dimensionality reduction."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    X_train_pca, X_test_pca, pca = reduce_dimensions(X_train, X_test, n_components=30)
+    assert X_train_pca.shape[1] == 30
+    assert X_test_pca.shape[1] == 30
+    assert pca is not None
+
+def test_train_rf_model(digits_data):
+    """Verify RandomForest training."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    assert model is not None
+    assert hasattr(model, 'predict')
+    assert model.named_steps['regressor'].random_state == 42
+
+def test_train_gb_model(digits_data):
+    """Verify GradientBoosting training."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="gb", cv=3)
+    assert model is not None
+    assert hasattr(model, 'predict')
+    assert model.named_steps['regressor'].random_state == 42
+
+def test_train_knn_model(digits_data):
+    """Verify KNeighbors training."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="knn", cv=3)
+    assert model is not None
+    assert hasattr(model, 'predict')
+
+def test_train_svc_model(digits_data):
+    """Verify SVC training."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="svc", cv=3)
+    assert model is not None
+    assert hasattr(model, 'predict')
+    assert model.named_steps['regressor'].random_state == 42
+
+def test_train_lr_model(digits_data):
+    """Verify LogisticRegression training."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="lr", cv=3)
+    assert model is not None
+    assert hasattr(model, 'predict')
+    assert model.named_steps['regressor'].random_state == 42
+
+def test_train_mlp_model(digits_data):
+    """Verify MLPClassifier training."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="mlp", cv=3)
+    assert model is not None
+    assert hasattr(model, 'predict')
+    assert model.named_steps['regressor'].random_state == 42
+
+def test_train_xgb_model(digits_data):
+    """Verify XGBoost training."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="xgb", cv=3)
+    assert model is not None
+    assert hasattr(model, 'predict')
+    assert model.named_steps['regressor'].random_state == 42
+
+def test_train_rf_model_pipeline(digits_data):
+    """Verify RandomForest pipeline."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    assert isinstance(model, Pipeline)
+    assert list(model.named_steps.keys()) == ['regressor']
+
+def test_train_rf_model_predictions(digits_data):
+    """Verify RandomForest predictions."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    predictions = model.predict(X_test)
+    assert predictions.shape == (y_test.shape[0],)
+    assert np.all((predictions >= 0) & (predictions <= 9))
+
+def test_evaluate_rf_model(caplog, digits_data):
+    """Verify RandomForest evaluation."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    for file in glob.glob("output/handwriting_rf_cm_*.png"):
+        os.remove(file)
+    caplog.set_level(logging.INFO, logger="root")
+    metrics = evaluate_model(model, X_test, y_test, digits, debug=False, model_type="rf")
+    assert "Test Set Metrics (rf)" in caplog.text
+    assert "Accuracy" in caplog.text
+    assert len(glob.glob("output/handwriting_rf_cm_*.png")) == 0
+    assert metrics["accuracy"] >= 0.85
+
+def test_evaluate_rf_model_debug(digits_data):
+    """Verify RandomForest debug plots."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    for file in glob.glob("output/handwriting_rf_cm_*.png"):
+        os.remove(file)
+    for file in glob.glob("output/handwriting_rf_importances_*.png"):
+        os.remove(file)
+    evaluate_model(model, X_test, y_test, digits, debug=True, model_type="rf")
+    assert len(glob.glob("output/handwriting_rf_cm_*.png")) > 0
+    assert len(glob.glob("output/handwriting_rf_importances_*.png")) > 0
+
+def test_evaluate_gb_model(caplog, digits_data):
+    """Verify GradientBoosting evaluation."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="gb", cv=3)
+    for file in glob.glob("output/handwriting_gb_cm_*.png"):
+        os.remove(file)
+    caplog.set_level(logging.INFO, logger="root")
+    metrics = evaluate_model(model, X_test, y_test, digits, debug=False, model_type="gb")
+    assert "Test Set Metrics (gb)" in caplog.text
+    assert "Accuracy" in caplog.text
+    assert len(glob.glob("output/handwriting_gb_cm_*.png")) == 0
+    assert metrics["accuracy"] >= 0.75
+
+def test_evaluate_xgb_model(caplog, digits_data):
+    """Verify XGBoost evaluation."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="xgb", cv=3)
+    for file in glob.glob("output/handwriting_xgb_cm_*.png"):
+        os.remove(file)
+    caplog.set_level(logging.INFO, logger="root")
+    metrics = evaluate_model(model, X_test, y_test, digits, debug=False, model_type="xgb")
+    assert "Test Set Metrics (xgb)" in caplog.text
+    assert "Accuracy" in caplog.text
+    assert len(glob.glob("output/handwriting_xgb_cm_*.png")) == 0
+    assert metrics["accuracy"] >= 0.85
+
+def test_evaluate_rf_pca_model(caplog, digits_data):
+    """Verify RandomForest with PCA."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    X_train_pca, X_test_pca, pca = reduce_dimensions(X_train, X_test, n_components=30)
+    model = train_model(X_train_pca[:200], y_train[:200], model_type="rf", cv=3)
+    for file in glob.glob("output/handwriting_rf_pca_cm_*.png"):
+        os.remove(file)
+    caplog.set_level(logging.INFO, logger="root")
+    metrics = evaluate_model(model, X_test_pca, y_test, digits, debug=False, model_type="rf_pca")
+    assert "Test Set Metrics (rf_pca)" in caplog.text
+    assert "Accuracy" in caplog.text
+    assert len(glob.glob("output/handwriting_rf_pca_cm_*.png")) == 0
+    assert metrics["accuracy"] >= 0.80
+
+def test_evaluate_lr_model(caplog, digits_data):
+    """Verify LogisticRegression evaluation."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="lr", cv=3)
+    for file in glob.glob("output/handwriting_lr_cm_*.png"):
+        os.remove(file)
+    caplog.set_level(logging.INFO, logger="root")
+    metrics = evaluate_model(model, X_test, y_test, digits, debug=False, model_type="lr")
+    assert "Test Set Metrics (lr)" in caplog.text
+    assert "Accuracy" in caplog.text
+    assert len(glob.glob("output/handwriting_lr_cm_*.png")) == 0
+    assert metrics["accuracy"] >= 0.85
+
+def test_evaluate_mlp_model(caplog, digits_data):
+    """Verify MLPClassifier evaluation."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="mlp", cv=3)
+    for file in glob.glob("output/handwriting_mlp_cm_*.png"):
+        os.remove(file)
+    caplog.set_level(logging.INFO, logger="root")
+    metrics = evaluate_model(model, X_test, y_test, digits, debug=False, model_type="mlp")
+    assert "Test Set Metrics (mlp)" in caplog.text
+    assert "Accuracy" in caplog.text
+    assert len(glob.glob("output/handwriting_mlp_cm_*.png")) == 0
+    assert metrics["accuracy"] >= 0.85
+
+def test_measure_rf_model(caplog, digits_data):
+    """Verify RandomForest accuracy metrics."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    caplog.set_level(logging.INFO, logger="root")
+    measure_model(model, X_train[:200], y_train[:200], X_test, y_test, model_type="rf")
+    assert "Training Set Accuracy (rf)" in caplog.text
+    assert "Test Set Accuracy (rf)" in caplog.text
+    assert "Cross-validated Accuracy (rf)" in caplog.text
+
+def test_save_rf_model(digits_data):
+    """Verify model saving."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    save_model(model, scaler, model_type="rf")
+    assert len(glob.glob("output/handwriting_rf_model_*.pkl")) > 0
+
+def test_debug(digits_data):
+    """Verify debug heatmap."""
+    X, y, digits = digits_data
+    debug(X, y, digits, debug_mode=True)
+    assert len(glob.glob("output/handwriting_heatmap_*.png")) > 0
+
+def test_load_dataset_error(caplog):
+    """Verify dataset load error handling."""
+    with patch("handwriting.load_digits") as mock_load_digits:
+        mock_load_digits.side_effect = Exception("Mock error")
+        caplog.set_level(logging.ERROR, logger="root")
+        X, y, digits = load_dataset()
+        assert "Error loading dataset: Mock error" in caplog.text
+        assert X is None
+        assert y is None
+        assert digits is None
+
+def test_split_dataset_error(monkeypatch, digits_data):
+    """Verify split error handling."""
+    X, y, digits = digits_data
+    def mock_fit_transform(*args, **kwargs):
+        raise Exception("Mock error")
+    monkeypatch.setattr("sklearn.preprocessing.StandardScaler.fit_transform", mock_fit_transform)
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    assert X_train is None
+    assert X_test is None
+    assert y_train is None
+    assert y_test is None
+    assert scaler is None
+
+def test_train_model_error(monkeypatch, digits_data):
+    """Verify training error handling."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    def mock_fit(*args, **kwargs):
+        raise Exception("Mock error")
+    monkeypatch.setattr("sklearn.model_selection.GridSearchCV.fit", mock_fit)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    assert model is None
+
+def test_evaluate_model_error(monkeypatch, caplog, digits_data):
+    """Verify evaluation error handling."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    def mock_predict(*args, **kwargs):
+        raise Exception("Mock error")
+    monkeypatch.setattr("sklearn.pipeline.Pipeline.predict", mock_predict)
+    caplog.set_level(logging.ERROR, logger="root")
+    evaluate_model(model, X_test, y_test, digits, debug=False, model_type="rf")
+    assert "Error evaluating rf model" in caplog.text
+
+def test_predict_new_image(digits_data):
+    """Verify prediction for new image."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    save_model(model, scaler, model_type="rf")
+    model_path = glob.glob("output/handwriting_rf_model_*.pkl")[-1]
+    image_data = X[:1]
+    prediction = predict_new_image(model_path, image_data, scaler)
+    assert prediction is not None
+    assert prediction.shape == (1,)
+    assert 0 <= prediction[0] <= 9
+
+def test_predict_noisy_image(digits_data):
+    """Verify prediction robustness with Gaussian noise added to an image."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    
+    # Add Gaussian noise to a test image
+    np.random.seed(42)
+    noisy_image = X_test[:1].copy()
+    noise = np.random.normal(0, 0.5, noisy_image.shape)
+    noisy_image += noise
+    noisy_image = np.clip(noisy_image, 0, 16)
+    
+    # Predict with noisy image
+    prediction = model.predict(scaler.transform(noisy_image))
+    assert prediction.shape == (1,)
+    assert 0 <= prediction[0] <= 9
+
+def test_predict_missing_pixels(digits_data):
+    """Verify prediction robustness with missing pixels (set to zero)."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    
+    # Set 20% of pixels to zero
+    np.random.seed(42)
+    missing_image = X_test[:1].copy()
+    mask = np.random.choice([0, 1], size=missing_image.shape, p=[0.2, 0.8])
+    missing_image *= mask
+    
+    # Predict with missing pixels
+    prediction = model.predict(scaler.transform(missing_image))
+    assert prediction.shape == (1,)
+    assert 0 <= prediction[0] <= 9
+
+def test_predict_extreme_noise(digits_data):
+    """Verify prediction robustness with high-variance Gaussian noise."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    
+    # Add high-variance Gaussian noise to a test image
+    np.random.seed(42)
+    noisy_image = X_test[:1].copy()
+    noise = np.random.normal(0, 1.0, noisy_image.shape)
+    noisy_image += noise
+    noisy_image = np.clip(noisy_image, 0, 16)
+    
+    # Predict with noisy image
+    prediction = model.predict(scaler.transform(noisy_image))
+    assert prediction.shape == (1,)
+    assert 0 <= prediction[0] <= 9
+
+def test_predict_high_missing_pixels(digits_data):
+    """Verify prediction robustness with 50% missing pixels."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    
+    # Set 50% of pixels to zero
+    np.random.seed(42)
+    missing_image = X_test[:1].copy()
+    mask = np.random.choice([0, 1], size=missing_image.shape, p=[0.5, 0.5])
+    missing_image *= mask
+    
+    # Predict with missing pixels
+    prediction = model.predict(scaler.transform(missing_image))
+    assert prediction.shape == (1,)
+    assert 0 <= prediction[0] <= 9
+
+def test_predict_rotated_image(digits_data):
+    """Verify prediction robustness with 90-degree rotated image."""
+    X, y, digits = digits_data
+    X_train, X_test, y_train, y_test, scaler = split_dataset(X, y)
+    model = train_model(X_train[:200], y_train[:200], model_type="rf", cv=3)
+    
+    # Reshape to 8x8, rotate 90 degrees clockwise, and flatten
+    rotated_image = X_test[:1].copy().reshape(1, 8, 8)
+    rotated_image = np.rot90(rotated_image, k=1, axes=(1, 2)).reshape(1, 64)
+    
+    # Predict with rotated image
+    prediction = model.predict(scaler.transform(rotated_image))
+    assert prediction.shape == (1,)
+    assert 0 <= prediction[0] <= 9
+
+if __name__ == "__main__":
+    pytest.main(["-v", "--log-cli-level=INFO"])
